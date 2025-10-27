@@ -1,0 +1,236 @@
+<?php
+/**
+ * Template Name: Registrace
+ */
+
+get_header();
+?>
+
+<div class="content-wrapper">
+    <h1>Nová registrace</h1>
+    <ul class="steps">
+        <li class="active" data-step="1"><span>Osobní informace</span></li>
+        <li data-step="2"><span>Přihlašovací údaje</span></li>
+        <li data-step="3"><span>Dokončení registrace</span></li>
+        <li data-step="4"><span>Nákup produktu</span></li>
+    </ul>
+
+    <div class="form-holder ">
+        <!-- Krok 1: Osobní informace -->
+        <div class="registration-step small-container" id="step-1">
+            <h3>Osobní informace</h3>
+            <form class="registration step-1" id="registration-form-1">
+                <?php wp_nonce_field('registrace_ajax', 'registrace_nonce'); ?>
+                <input type="hidden" id="modal_nonce" name="modal_nonce" value="<?php echo wp_create_nonce('registrace_ajax'); ?>">
+                <div class="label-holder">
+                    <label for="name">Jméno</label>
+                    <input type="text" id="name" name="name" placeholder="Vaše jméno" required>
+                </div>
+                <div class="label-holder">
+                    <label for="surname">Příjmení</label>
+                    <input type="text" id="surname" name="surname" placeholder="Vaše příjmení" required>
+                </div>
+                <div class="label-holder">
+                    <label for="address">Adresa - ulice</label>
+                    <input type="text" id="address" name="address" placeholder="Ulice">
+                </div>
+                <div class="column">
+                    <div class="label-holder">
+                        <label for="city">Adresa - Město</label>
+                        <input type="text" id="city" name="city" placeholder="Město">
+                    </div>
+                    <div class="label-holder">
+                        <label for="psc">Psč</label>
+                        <input type="text" id="psc" name="psc" placeholder="Psč">
+                    </div>
+                </div>
+                <div class="btn-holder">
+                    <button class="btn btn-primary next-step" type="button" data-next="2">Pokračovat</button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Krok 2: Přihlašovací údaje -->
+        <div class="registration-step small-container" id="step-2" style="display: none;">
+            <h3>Přihlašovací údaje</h3>
+            <form class="registration step-2" id="registration-form-2">
+                <div class="label-holder">
+                    <label for="mail">Email</label>
+                    <input type="email" id="mail" name="mail" placeholder="Váš e-mail" required>
+                </div>
+                <div class="label-holder">
+                    <label for="login">Uživatelské jméno</label>
+                    <input type="text" id="login" name="login" placeholder="Vaše jméno" required>
+                </div>
+                <div class="label-holder">
+                    <label for="password">Heslo</label>
+                    <input type="password" id="password" name="password" placeholder="**********" required>
+                </div>
+                <div class="label-holder">
+                    <label for="phone">Telefon</label>
+                    <input type="tel" id="phone" name="phone" placeholder="Váš telefon" required>
+                </div>
+                <div class="btns-holder">
+                    <button class="btn btn-secondary prev-step" type="button" data-prev="1">Předchozí</button>
+                    <button class="btn btn-primary next-step" type="button" data-next="3">Pokračovat</button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Krok 3: Dokončení registrace -->
+        <div class="registration-step small-container" id="step-3" style="display: none;">
+            <h3>Dokončení registrace</h3>
+            <form class="registration step-3" id="registration-form-3">
+                <div class="label-holder">
+                    <label for="club-search">Vyberte svůj oblíbený klub</label>
+                    <input type="search" id="club-search" name="club_search" placeholder="Vyhledat klub">
+                    <input type="hidden" id="selected-club" name="selected_club">
+                </div>
+                <div class="label-holder">
+                    <label>
+                        <input type="checkbox" name="terms_agreement" required>
+                        <span>
+                            Jsem starší 18 let a souhlasím s <a href="#">ochranou osobních údajů</a>,
+                            <a href="#">herními plány</a>, a s <a href="#">obchodními podmínkami</a>.
+                        </span>
+                    </label>
+                </div>
+                <div class="label-holder">
+                    <label>
+                        <input type="checkbox" name="marketing_agreement"/>
+                        <span>
+                            Souhlasím se zpracováním výše uvedených osobních údajů za účelem marketingových aktivit včetně zasílání marketingových zpráv a informování o produktech a službách (např. bonusy atd.). Potvrzuji, že jsem se seznámil s celým textem <a href="#">souhlasu</a>.
+                        </span>
+                    </label>
+                </div>
+                <div class="btns-holder">
+                    <button class="btn btn-secondary prev-step" type="button" data-prev="2">Předchozí</button>
+                    <button class="btn btn-primary next-step" type="button" data-next="4">Zaregistrovat se</button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Krok 4: Nákup produktu -->
+        <div class="registration-step  " id="step-4" style="display: none;">
+            <h3>Nákup produktu</h3>
+            <div class="subtitle">
+                Vyberte si produkt, který vám nejvíce vyhovuje. Získejte přístup k našim tipovacím soutěžím a staňte se součástí naší komunity.
+            </div>
+            
+            <div class="products">
+                <?php
+                // Získání produktů WooCommerce
+                $args = array(
+                    'post_type'      => 'product',
+                    'posts_per_page' => 4,
+                    'orderby'        => 'date',
+                    'order'          => 'DESC',
+                );
+                
+                $products_query = new WP_Query($args);
+                
+                if ($products_query->have_posts()) :
+                    while ($products_query->have_posts()) : $products_query->the_post();
+                        global $product;
+                        if ($product && $product->is_purchasable()) :
+                ?>
+                <div class="product" data-product-id="<?php echo esc_attr($product->get_id()); ?>" data-product-price="<?php echo esc_attr($product->get_price()); ?>">
+                    <div class="img-holder">
+                        <?php if (has_post_thumbnail()) : ?>
+                            <?php the_post_thumbnail('medium'); ?>
+                        <?php else : ?>
+                            <img src="<?php echo esc_url(get_template_directory_uri() . '/assets/images/product-photo.jpg'); ?>" alt="<?php the_title_attribute(); ?>" loading="lazy">
+                        <?php endif; ?>
+                    </div>
+                    <div class="product-text">
+                        <h3 class="product-title"><?php the_title(); ?></h3>
+                        <h4 class="product-price">cena: <?php echo $product->get_price_html(); ?></h4>
+                        <div class="product-description">
+                            <?php echo wp_trim_words(get_the_excerpt(), 15, '...'); ?>
+                        </div>
+                        <div class="btn-holder">
+                            <button type="button" class="btn btn-primary buy-product" data-product-id="<?php echo esc_attr($product->get_id()); ?>">Koupit</button>
+                        </div>
+                    </div>
+                </div>
+                <?php 
+                        endif;
+                    endwhile;
+                    wp_reset_postdata();
+                else :
+                ?>
+                <div class="no-products">
+                    <p>Momentálně nejsou k dispozici žádné produkty.</p>
+                </div>
+                <?php endif; ?>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modální okno pro výběr platby -->
+    <div id="payment-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal">&times;</span>
+            <h3>Dokončení objednávky</h3>
+            
+            <div class="order-summary">
+                <h4>Souhrn objednávky</h4>
+                <div class="product-info">
+                    <p><strong>Produkt:</strong> <span id="modal-product-name"></span></p>
+                    <p><strong>Cena:</strong> <span id="modal-product-price"></span></p>
+                </div>
+            </div>
+            
+            <div class="customer-info">
+                <h4>Údaje zákazníka</h4>
+                <p><strong>Jméno:</strong> <span id="modal-customer-name"></span></p>
+                <p><strong>Email:</strong> <span id="modal-customer-email"></span></p>
+                <p><strong>Telefon:</strong> <span id="modal-customer-phone"></span></p>
+            </div>
+            
+            <div class="payment-methods">
+                <h4>Vyberte způsob platby</h4>
+                <div class="payment-options">
+                    <?php
+                    // Načtení dostupných platebních metod z WooCommerce
+                    if (class_exists('WooCommerce')) {
+                        $payment_gateways = WC()->payment_gateways->get_available_payment_gateways();
+                        
+                        if (!empty($payment_gateways)) {
+                            $first = true;
+                            foreach ($payment_gateways as $gateway) {
+                                if ($gateway->enabled === 'yes') {
+                                    echo '<label>';
+                                    echo '<input type="radio" name="payment_method" value="' . esc_attr($gateway->id) . '"' . ($first ? ' checked' : '') . '>';
+                                    echo '<span>' . esc_html($gateway->get_title()) . '</span>';
+                                    echo '</label>';
+                                    $first = false;
+                                }
+                            }
+                        } else {
+                            // Výchozí možnosti, pokud nejsou žádné platební brány dostupné
+                            echo '<label>';
+                            echo '<input type="radio" name="payment_method" value="bacs" checked>';
+                            echo '<span>Bankovní převod</span>';
+                            echo '</label>';
+                        }
+                    } else {
+                        // Výchozí možnosti, pokud WooCommerce není aktivní
+                        echo '<label>';
+                        echo '<input type="radio" name="payment_method" value="bacs" checked>';
+                        echo '<span>Bankovní převod</span>';
+                        echo '</label>';
+                    }
+                    ?>
+                </div>
+            </div>
+            
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" id="cancel-order">Zrušit</button>
+                <button type="button" class="btn btn-primary" id="confirm-order">Potvrdit objednávku</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<?php get_footer(); ?>

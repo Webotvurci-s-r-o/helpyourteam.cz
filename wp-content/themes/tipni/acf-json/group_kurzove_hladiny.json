@@ -1,0 +1,160 @@
+{
+    "key": "group_kurzove_hladiny",
+    "title": "Nastavení kurzových hladin",
+    "fields": [
+        {
+            "key": "field_kurzove_hladiny_info",
+            "label": "Informace",
+            "name": "",
+            "type": "message",
+            "instructions": "",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "message": "Zde nastavte kurzové hladiny a bodové ohodnocení pro jednotlivé rozsahy kurzů. Při správném tipu se příslušný počet bodů připočte, při špatném odečte.",
+            "new_lines": "wpautop",
+            "esc_html": 0
+        },
+        {
+            "key": "field_kurzove_hladiny",
+            "label": "Kurzové hladiny",
+            "name": "kurzove_hladiny",
+            "type": "repeater",
+            "instructions": "Nastavte kurzové hladiny a odpovídající bodové ohodnocení",
+            "required": 1,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "collapsed": "",
+            "min": 1,
+            "max": 0,
+            "layout": "table",
+            "button_label": "Přidat hladinu",
+            "sub_fields": [
+                {
+                    "key": "field_kurz_od",
+                    "label": "Kurz od",
+                    "name": "kurz_od",
+                    "type": "number",
+                    "instructions": "",
+                    "required": 1,
+                    "conditional_logic": 0,
+                    "wrapper": {
+                        "width": "25",
+                        "class": "",
+                        "id": ""
+                    },
+                    "default_value": 1,
+                    "placeholder": "",
+                    "prepend": "",
+                    "append": "",
+                    "min": 1,
+                    "max": "",
+                    "step": 0.01
+                },
+                {
+                    "key": "field_kurz_do",
+                    "label": "Kurz do",
+                    "name": "kurz_do",
+                    "type": "number",
+                    "instructions": "",
+                    "required": 0,
+                    "conditional_logic": 0,
+                    "wrapper": {
+                        "width": "25",
+                        "class": "",
+                        "id": ""
+                    },
+                    "default_value": "",
+                    "placeholder": "Nechte prázdné pro nejvyšší hladinu",
+                    "prepend": "",
+                    "append": "",
+                    "min": 1,
+                    "max": "",
+                    "step": 0.01
+                },
+                {
+                    "key": "field_body",
+                    "label": "Počet bodů",
+                    "name": "body",
+                    "type": "number",
+                    "instructions": "",
+                    "required": 1,
+                    "conditional_logic": 0,
+                    "wrapper": {
+                        "width": "25",
+                        "class": "",
+                        "id": ""
+                    },
+                    "default_value": 1,
+                    "placeholder": "",
+                    "prepend": "",
+                    "append": "",
+                    "min": 1,
+                    "max": "",
+                    "step": 1
+                },
+                {
+                    "key": "field_popis",
+                    "label": "Popis hladiny",
+                    "name": "popis",
+                    "type": "text",
+                    "instructions": "",
+                    "required": 0,
+                    "conditional_logic": 0,
+                    "wrapper": {
+                        "width": "25",
+                        "class": "",
+                        "id": ""
+                    },
+                    "default_value": "",
+                    "placeholder": "Volitelný popis",
+                    "prepend": "",
+                    "append": "",
+                    "maxlength": ""
+                }
+            ]
+        },
+        {
+            "key": "field_kurz_preview",
+            "label": "Náhled bodového hodnocení",
+            "name": "",
+            "type": "message",
+            "instructions": "",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "message": "Po uložení změn se zde zobrazí přehled bodového hodnocení podle nastavených kurzových hladin.",
+            "new_lines": "wpautop",
+            "esc_html": 0
+        }
+    ],
+    "location": [
+        [
+            {
+                "param": "options_page",
+                "operator": "==",
+                "value": "kurzove-hladiny"
+            }
+        ]
+    ],
+    "menu_order": 0,
+    "position": "normal",
+    "style": "default",
+    "label_placement": "top",
+    "instruction_placement": "label",
+    "hide_on_screen": "",
+    "active": true,
+    "description": ""
+}

@@ -1,0 +1,174 @@
+{
+    "key": "group_tips",
+    "title": "Tipy uživatelů",
+    "fields": [
+        {
+            "key": "field_tip_user",
+            "label": "Uživatel",
+            "name": "tip_user",
+            "type": "user",
+            "instructions": "Uživatel, který vytvořil tip",
+            "required": 1,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "role": "",
+            "allow_null": 0,
+            "multiple": 0,
+            "return_format": "object"
+        },
+        {
+            "key": "field_tip_match",
+            "label": "Zápas",
+            "name": "tip_match",
+            "type": "post_object",
+            "instructions": "Zápas, pro který je tip vytvořen",
+            "required": 1,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "post_type": [
+                "zapas"
+            ],
+            "taxonomy": "",
+            "allow_null": 0,
+            "multiple": 0,
+            "return_format": "object",
+            "ui": 1
+        },
+        {
+            "key": "field_tip_competition",
+            "label": "Soutěž",
+            "name": "tip_competition",
+            "type": "post_object",
+            "instructions": "Soutěž, ke které tip patří",
+            "required": 1,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "post_type": [
+                "soutez"
+            ],
+            "taxonomy": "",
+            "allow_null": 0,
+            "multiple": 0,
+            "return_format": "object",
+            "ui": 1
+        },
+        {
+            "key": "field_tip_round",
+            "label": "Kolo",
+            "name": "tip_round",
+            "type": "post_object",
+            "instructions": "Kolo, ke kterému tip patří",
+            "required": 1,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "post_type": [
+                "kolo"
+            ],
+            "taxonomy": "",
+            "allow_null": 0,
+            "multiple": 0,
+            "return_format": "object",
+            "ui": 1
+        },
+        {
+            "key": "field_tip_value",
+            "label": "Hodnota tipu",
+            "name": "tip_value",
+            "type": "select",
+            "instructions": "Tip uživatele na výsledek zápasu",
+            "required": 1,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "choices": {
+                "1": "Výhra domácích (1)",
+                "0": "Remíza (0)",
+                "2": "Výhra hostů (2)"
+            },
+            "default_value": "",
+            "allow_null": 0,
+            "multiple": 0,
+            "ui": 0,
+            "return_format": "value",
+            "ajax": 0,
+            "placeholder": ""
+        },
+        {
+            "key": "field_tip_points",
+            "label": "Získané body",
+            "name": "tip_points",
+            "type": "number",
+            "instructions": "Počet bodů získaných za tento tip",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "default_value": 0,
+            "placeholder": "",
+            "prepend": "",
+            "append": "bodů",
+            "min": 0,
+            "max": "",
+            "step": ""
+        },
+        {
+            "key": "field_tip_evaluated",
+            "label": "Vyhodnoceno",
+            "name": "tip_evaluated",
+            "type": "true_false",
+            "instructions": "Byl tip již vyhodnocen?",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "message": "",
+            "default_value": 0,
+            "ui": 1,
+            "ui_on_text": "Ano",
+            "ui_off_text": "Ne"
+        }
+    ],
+    "location": [
+        [
+            {
+                "param": "post_type",
+                "operator": "==",
+                "value": "user_tip"
+            }
+        ]
+    ],
+    "menu_order": 0,
+    "position": "normal",
+    "style": "default",
+    "label_placement": "top",
+    "instruction_placement": "label",
+    "hide_on_screen": "",
+    "active": true,
+    "description": "",
+    "modified": 1711023000
+}

@@ -1,0 +1,50 @@
+{
+    "key": "group_liga_taxonomy",
+    "title": "Nastavení ligy",
+    "fields": [
+        {
+            "key": "field_liga_obrazek",
+            "label": "Obrázek ligy",
+            "name": "obrazek_ligy",
+            "type": "image",
+            "instructions": "Vyberte obrázek nebo logo ligy, které se bude zobrazovat vedle názvu ligy",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "return_format": "array",
+            "preview_size": "thumbnail",
+            "library": "all",
+            "min_width": "",
+            "min_height": "",
+            "min_size": "",
+            "max_width": "",
+            "max_height": "",
+            "max_size": "",
+            "mime_types": "jpg,jpeg,png,svg"
+        }
+    ],
+    "location": [
+        [
+            {
+                "param": "taxonomy",
+                "operator": "==",
+                "value": "liga"
+            }
+        ]
+    ],
+    "menu_order": 0,
+    "position": "normal",
+    "style": "default",
+    "label_placement": "top",
+    "instruction_placement": "label",
+    "hide_on_screen": "",
+    "active": true,
+    "description": "Rozšířená pole pro taxonomii Liga",
+    "show_in_rest": 0,
+    "local": "json",
+    "modified": 1734602640
+}

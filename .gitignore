@@ -1,0 +1,103 @@
+# WordPress core files
+/wp-admin/
+/wp-includes/
+/wp-content/uploads/
+/wp-content/cache/
+/wp-content/upgrade/
+/wp-content/backup*/
+/wp-content/blogs.dir/
+/wp-content/upgrade-temp-backup/
+/wp-content/debug.log
+/wp-content/mu-plugins/
+/wp-content/object-cache.php
+/wp-content/index.php
+/wp-content/wp-cache-config.php
+/wp-content/advanced-cache.php
+/wp-content/db.php
+/wp-content/backup-db/
+/wp-content/blogs.dir/
+/wp-content/uploads/wpforms/
+
+# WordPress specific
+/sitemap.xml
+/sitemap.xml.gz
+/wp-config.php
+/wp-config-sample.php
+.htaccess
+htaccess.txt
+
+# WordPress database
+*.sql
+*.sql.gz
+
+# WP-CLI
+/wp-cli.phar
+/wp-cli.yml
+
+# Logs
+*.log
+debug.log
+error_log
+error_log.txt
+
+# System files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+desktop.ini
+
+# IDE files
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+*.code-workspace
+.project
+.classpath
+.settings/
+*.swp
+*.swo
+*~
+
+# Dependencies
+node_modules/
+npm-debug.log
+yarn-error.log
+package-lock.json
+yarn.lock
+
+# Build files
+/dist/
+/build/
+*.map
+
+# Temporary files
+*.tmp
+*.temp
+.cache/
+
+# PHP specific
+composer.lock
+vendor/
+.env
+.env.local
+.env.*.local
+
+# Backup files
+*.bak
+*.backup
+*.old
+*.orig
+*.save
+
+# OS files
+.directory
+*.lock
+.ftpconfig
+.ftppass
+.gitattributes
+

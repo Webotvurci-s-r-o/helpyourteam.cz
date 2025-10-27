@@ -1,0 +1,46 @@
+/**
+ * Stylizace pro stránku kurzových hladin
+ */
+.odds-levels-preview {
+    margin-top: 20px;
+}
+
+.odds-levels-preview h3 {
+    margin-bottom: 15px;
+}
+
+.odds-levels-preview table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.odds-levels-preview th {
+    font-weight: bold;
+    text-align: left;
+    padding: 10px;
+}
+
+.odds-levels-preview td {
+    padding: 10px;
+}
+
+.odds-levels-preview p.description {
+    margin-top: 15px;
+    font-style: italic;
+}
+
+/* Nastavení šířky sloupců */
+.odds-levels-preview th:nth-child(1),
+.odds-levels-preview td:nth-child(1) {
+    width: 30%;
+}
+
+.odds-levels-preview th:nth-child(2),
+.odds-levels-preview td:nth-child(2) {
+    width: 20%;
+}
+
+.odds-levels-preview th:nth-child(3),
+.odds-levels-preview td:nth-child(3) {
+    width: 50%;
+}

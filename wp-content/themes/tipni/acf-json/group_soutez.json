@@ -1,0 +1,291 @@
+{
+    "key": "group_soutez",
+    "title": "Informace o soutěži",
+    "fields": [
+        {
+            "key": "field_je_hlavni",
+            "label": "Hlavní soutěž",
+            "name": "je_hlavni",
+            "type": "true_false",
+            "instructions": "Zaškrtněte, pokud se jedná o hlavní soutěž.",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "message": "",
+            "default_value": 0,
+            "ui": 1,
+            "ui_on_text": "Ano",
+            "ui_off_text": "Ne"
+        },
+        {
+            "key": "field_pocet_bodu",
+            "label": "Počet bodů",
+            "name": "pocet_bodu",
+            "type": "number",
+            "instructions": "Počet bodů, které hráč získá za správný tip",
+            "required": 1,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "default_value": 30,
+            "placeholder": "",
+            "prepend": "",
+            "append": "bodů",
+            "min": 0,
+            "max": "",
+            "step": 1
+        },
+        {
+            "key": "field_woocommerce_produkt",
+            "label": "WooCommerce produkt",
+            "name": "woocommerce_produkt",
+            "type": "post_object",
+            "instructions": "Vyberte produkt WooCommerce, který musí uživatel zakoupit pro přístup k této soutěži",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "post_type": [
+                "product"
+            ],
+            "taxonomy": "",
+            "allow_null": 1,
+            "multiple": 0,
+            "return_format": "id",
+            "ui": 1
+        },
+        {
+            "key": "field_kola_souteze",
+            "label": "Kola soutěže",
+            "name": "kola_souteze",
+            "type": "relationship",
+            "instructions": "Vyberte kola, která patří do této soutěže",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "post_type": [
+                "kolo"
+            ],
+            "taxonomy": "",
+            "filters": [
+                "search"
+            ],
+            "elements": "",
+            "min": "",
+            "max": "",
+            "return_format": "id"
+        },
+        {
+            "key": "field_ceny_souteze",
+            "label": "Ceny soutěže",
+            "name": "ceny_souteze",
+            "type": "group",
+            "instructions": "Nastavení cen pro soutěž",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "layout": "block",
+            "sub_fields": [
+                {
+                    "key": "field_ceny_nadpis",
+                    "label": "Nadpis sekce",
+                    "name": "nadpis_sekce",
+                    "type": "text",
+                    "instructions": "Zadejte nadpis pro sekci s cenami",
+                    "required": 0,
+                    "conditional_logic": 0,
+                    "wrapper": {
+                        "width": "",
+                        "class": "",
+                        "id": ""
+                    },
+                    "default_value": "Ceny",
+                    "placeholder": "Ceny",
+                    "prepend": "",
+                    "append": "",
+                    "maxlength": ""
+                },
+                {
+                    "key": "field_ceny_popis",
+                    "label": "Popis sekce",
+                    "name": "popis_sekce",
+                    "type": "textarea",
+                    "instructions": "Zadejte popis pro sekci s cenami",
+                    "required": 0,
+                    "conditional_logic": 0,
+                    "wrapper": {
+                        "width": "",
+                        "class": "",
+                        "id": ""
+                    },
+                    "default_value": "",
+                    "placeholder": "Popis cen soutěže...",
+                    "maxlength": "",
+                    "rows": 3,
+                    "new_lines": "br"
+                },
+                {
+                    "key": "field_ceny_repeater",
+                    "label": "Seznam cen",
+                    "name": "ceny",
+                    "type": "repeater",
+                    "instructions": "Přidejte ceny pro soutěž. Pořadí cen určuje, která cena se přidělí jaké pozici v žebříčku.",
+                    "required": 0,
+                    "conditional_logic": 0,
+                    "wrapper": {
+                        "width": "",
+                        "class": "",
+                        "id": ""
+                    },
+                    "collapsed": "",
+                    "min": 0,
+                    "max": 0,
+                    "layout": "block",
+                    "button_label": "Přidat cenu",
+                    "sub_fields": [
+                        {
+                            "key": "field_cena_nazev",
+                            "label": "Název ceny",
+                            "name": "nazev",
+                            "type": "text",
+                            "instructions": "Zadejte název ceny (např. 1. místo, 2. místo)",
+                            "required": 1,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "33",
+                                "class": "",
+                                "id": ""
+                            },
+                            "default_value": "",
+                            "placeholder": "1. místo",
+                            "prepend": "",
+                            "append": "",
+                            "maxlength": ""
+                        },
+                        {
+                            "key": "field_cena_popis",
+                            "label": "Popis ceny",
+                            "name": "popis",
+                            "type": "textarea",
+                            "instructions": "Podrobný popis ceny",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "33",
+                                "class": "",
+                                "id": ""
+                            },
+                            "default_value": "",
+                            "placeholder": "Popis ceny...",
+                            "maxlength": "",
+                            "rows": 3,
+                            "new_lines": "br"
+                        },
+                        {
+                            "key": "field_cena_obrazek",
+                            "label": "Obrázek ceny",
+                            "name": "obrazek",
+                            "type": "image",
+                            "instructions": "Vyberte obrázek ceny",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "33",
+                                "class": "",
+                                "id": ""
+                            },
+                            "return_format": "array",
+                            "preview_size": "thumbnail",
+                            "library": "all",
+                            "min_width": "",
+                            "min_height": "",
+                            "min_size": "",
+                            "max_width": "",
+                            "max_height": "",
+                            "max_size": "",
+                            "mime_types": "jpg,jpeg,png,svg,svgz"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "key": "field_max_tipy",
+            "label": "Maximální počet tipů",
+            "name": "max_tipy",
+            "type": "number",
+            "instructions": "Maximální počet zápasů, které může uživatel natipovat v jednom kole",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "default_value": 15,
+            "placeholder": "15",
+            "prepend": "",
+            "append": "zápasů",
+            "min": 1,
+            "max": 50,
+            "step": 1
+        },
+        {
+            "key": "field_povolene_ligy",
+            "label": "Povolené ligy",
+            "name": "povolene_ligy",
+            "type": "taxonomy",
+            "instructions": "Vyberte ligy, které budou zobrazeny v této soutěži. Pokud není žádná liga vybrána, zobrazí se všechny ligy.",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "taxonomy": "liga",
+            "field_type": "multi_select",
+            "allow_null": 1,
+            "add_term": 0,
+            "save_terms": 0,
+            "load_terms": 0,
+            "return_format": "object",
+            "multiple": 1
+        }
+    ],
+    "location": [
+        [
+            {
+                "param": "post_type",
+                "operator": "==",
+                "value": "soutez"
+            }
+        ]
+    ],
+    "menu_order": 0,
+    "position": "normal",
+    "style": "default",
+    "label_placement": "top",
+    "instruction_placement": "label",
+    "hide_on_screen": "",
+    "active": true,
+    "description": ""
+}

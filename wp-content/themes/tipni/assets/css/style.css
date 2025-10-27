@@ -1,0 +1,2047 @@
+* {
+    box-sizing: border-box
+}
+
+img {
+    max-width: 100%
+}
+
+body {
+    background-color: #141414;
+    color: #fff;
+    font-family: Roboto, sans-serif;
+    font-size: var(--size-body);
+    line-height: 1.3;
+    padding-bottom: 70px;
+    margin: 0
+}
+
+a {
+    color: #fff;
+    text-decoration: none
+}
+
+:root {
+    --container-width: 1100px;
+    --narrow-container-width: 710px;
+    --size-h1: 48px;
+    --size-h2: 36px;
+    --size-h3: 24px;
+    --size-h4: 20px;
+    --size-body: 16px;
+    --size-smaller: 14px;
+    --size-small: 10px;
+    --color-primary: #FF443B
+}
+
+.h1,
+h1 {
+    font-size: var(--size-h1);
+    font-weight: 700;
+    margin: 25px 0
+}
+
+.h2,
+h2 {
+    font-size: var(--size-h2);
+    font-weight: 700
+}
+
+.h3,
+h3 {
+    font-size: var(--size-h3);
+    font-weight: 500
+}
+
+.h4,
+h4 {
+    font-size: var(--size-h4);
+    font-weight: 500
+}
+
+.h1,
+.h2,
+.h3,
+.h4,
+h1,
+h2,
+h3,
+h4 {
+    line-height: 1.18
+}
+
+.overall-wrapper {
+    width: var(--container-width);
+    margin: 0 auto;
+    padding: 0 20px
+}
+
+#header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 80px;
+    margin: 45px 0
+}
+
+.navigation {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    gap: 30px;
+    font-weight: 700
+}
+
+.menu-navigation {
+    display: none
+}
+
+.navigation-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 30px;
+}
+
+.header-cart {
+    position: relative;
+}
+
+.header-cart .cart-contents {
+    display: flex;
+    align-items: center;
+    position: relative;
+    color: #fff;
+    transition: opacity 0.3s;
+}
+
+.header-cart .cart-contents:hover {
+    opacity: 0.7;
+}
+
+.header-cart svg {
+    width: 24px;
+    height: 24px;
+}
+
+.header-cart .cart-count {
+    position: absolute;
+    top: -8px;
+    right: -8px;
+    background-color: var(--color-primary);
+    color: #fff;
+    font-size: 12px;
+    font-weight: 700;
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.header-cart .cart-count:empty {
+    display: none;
+}
+
+.navigation .highlighted {
+    line-height: 1.2;
+    padding: 7px 11px;
+    background-color: var(--color-primary);
+    border-radius: 10px;
+    display: inline-flex
+}
+
+.navigation a:hover {
+    text-decoration: underline
+}
+
+#footer {
+    margin-top: 100px
+}
+
+.partners {
+    padding-bottom: 50px;
+    margin-bottom: 50px;
+    border-bottom: .5px solid #fff
+}
+
+.partners h4 {
+    margin: 0 0 25px
+}
+
+.partners-inner {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 35px
+}
+
+.footer-bottom h4 {
+    margin: 0 0 25px
+}
+
+.footer-bottom .logo img {
+    filter: grayscale(1)
+}
+
+.footer-bottom__inner {
+    display: flex;
+    gap: 100px
+}
+
+.footer-bottom__inner>ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    grid-column-gap: 60px;
+    grid-row-gap: 20px
+}
+
+.copyright {
+    margin-top: 50px;
+    display: flex;
+    align-items: center;
+    gap: 30px;
+    font-size: var(--size-small)
+}
+
+#footer a:hover {
+    text-decoration: underline
+}
+
+.title-middle h1 {
+    text-align: center
+}
+
+.small-container {
+    width: 100%;
+    max-width: var(--narrow-container-width);
+    margin: 0 auto
+}
+
+.form-holder {
+    background: linear-gradient(180deg, #24242f 0, #15131d 100%);
+    border-radius: 8px;
+    border: 1px solid #21222d;
+    padding: 50px 100px;
+    margin: 40px auto 0
+}
+
+.login-error {
+    color: #ff443b;
+    margin-top: 20px;
+    text-align: center;
+    font-weight: 500;
+    padding: 10px;
+    border-radius: 5px
+}
+
+.login-loading {
+    color: #fff;
+    margin-top: 20px;
+    font-style: italic
+}
+
+form {
+    display: flex;
+    flex-direction: column;
+    gap: 22px
+}
+
+label {
+    font-weight: 700
+}
+
+.label-holder {
+    display: flex;
+    flex-direction: column;
+    gap: 10px
+}
+
+input {
+    min-height: 42px;
+    border-radius: 10px;
+    border: none;
+    padding: 5px 13px
+}
+
+form ::placeholder {
+    color: #6c6C6C4D
+}
+
+.forgot-password {
+    font-size: var(--size-small)
+}
+
+.forgot-password a {
+    font-weight: 700;
+    text-decoration: underline
+}
+
+.column {
+    display: flex;
+    align-items: center;
+    gap: 40px
+}
+
+.login .column {
+    margin-top: 12px
+}
+
+.column .forgot-password {
+    flex-grow: 1
+}
+
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 5px 30px;
+    border-radius: 8px;
+    min-height: 38px;
+    border: none;
+    cursor: pointer;
+    font-size: var(--size-smaller);
+    text-decoration: none
+}
+
+.btn:hover {
+    text-decoration: underline
+}
+
+.btn.arrow {
+    position: relative;
+    gap: 10px
+}
+
+.btn.bold {
+    font-weight: 700
+}
+
+.btn.arrow::before {
+    content: "";
+    position: relative;
+    display: inline-block;
+    width: 8px;
+    height: 12px;
+    mask-image: url("/wp-content/themes/tipni/assets/images/chevron-right.svg");
+    mask-repeat: no-repeat;
+    mask-size: 100%;
+    mask-position: center;
+    -webkit-mask-image: url("/wp-content/themes/tipni/assets/images/chevron-right.svg");
+    -webkit-mask-repeat: no-repeat;
+    -webkit-mask-size: 100%;
+    -webkit-mask-position: center;
+    background-color: #fff
+}
+
+.btn-primary {
+    background: linear-gradient(90deg, #b93532 0, #ff443b 100%);
+    color: #fff
+}
+
+.btn-secondary {
+    background-color: #a6a9b8
+}
+
+.btns-holder {
+    display: flex;
+    gap: 25px
+}
+
+.steps {
+    position: relative;
+    padding: 0;
+    list-style: none;
+    width: 100%;
+    max-width: var(--narrow-container-width);
+    margin: 90px auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    overflow: hidden
+}
+
+.steps::before {
+    content: "";
+    position: absolute;
+    width: 100%;
+    height: 1px;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    border-top: 1px solid #fff
+}
+
+.steps>li.active::before {
+    content: "";
+    position: absolute;
+    right: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    width: var(--narrow-container-width);
+    border-top: 1px solid var(--color-primary);
+    height: 1px
+}
+
+.steps li {
+    position: relative;
+    z-index: 1;
+    width: 24px;
+    height: 24px;
+    background-color: #fff;
+    border-radius: 50%
+}
+
+.steps li.active,
+.steps li.completed {
+    background-color: var(--color-primary)
+}
+
+.steps span {
+    display: none
+}
+
+.form-holder h3 {
+    margin: 0 0 14px;
+    text-align: center
+}
+
+.step-1 .column {
+    gap: 12px
+}
+
+.step-1 .column>div {
+    flex-grow: 1
+}
+
+.registration .btn-holder {
+    text-align: right
+}
+
+form label:has(+input[required])::after {
+    content: "*";
+    margin-left: 5px
+}
+
+.registration .btns-holder {
+    justify-content: flex-end
+}
+
+.registration .btn-holder,
+.registration .btns-holder {
+    margin-top: 12px
+}
+
+input[type=search] {
+    border-radius: 20px;
+    min-height: 48px;
+    padding: 5px 60px 5px 16px;
+    background-image: url("/wp-content/themes/tipni/assets/images/magnifier-black.svg");
+    background-repeat: no-repeat;
+    background-position: calc(100% - 25px) center;
+    background-size: 21px;
+    background-color: #fff
+}
+
+input[type=search]::placeholder {
+    color: #000
+}
+
+.registration.step-3 {
+    max-width: 368px;
+    margin: 40px auto 0
+}
+
+input[type=checkbox] {
+    position: relative;
+    appearance: none;
+    -moz-appearance: none;
+    -webkit-appearance: none;
+    width: 20px;
+    height: 20px;
+    background-color: #fff;
+    border-radius: 2px;
+    padding: 0;
+    flex-shrink: 0;
+    min-height: unset;
+    cursor: pointer;
+    margin: 0
+}
+
+label:has(input[type=checkbox]) {
+    display: flex;
+    gap: 15px;
+    align-items: flex-start
+}
+
+input[type=checkbox]:checked::before {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 100%;
+    height: 100%;
+    mask-image: url("/wp-content/themes/tipni/assets/images/check.svg");
+    mask-repeat: no-repeat;
+    mask-size: 15px;
+    mask-position: center;
+    -webkit-mask-image: url("/wp-content/themes/tipni/assets/images/check.svg");
+    -webkit-mask-repeat: no-repeat;
+    -webkit-mask-size: 15px;
+    -webkit-mask-position: center;
+    background-color: #000
+}
+
+label:has(input[type=checkbox]) {
+    font-weight: 400
+}
+
+label a {
+    text-decoration: underline
+}
+
+.step-3 .label-holder:has(input[type=search]) {
+    margin-bottom: 23px
+}
+
+.subtitle {
+    margin: 40px auto 0;
+    max-width: 530px;
+    text-align: center
+}
+
+.products {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-column-gap: 45px;
+    grid-row-gap: 45px
+}
+
+.product {
+    background: linear-gradient(180deg, #24242f 0, #15131d 100%);
+    display: flex;
+    align-items: stretch;
+    border-radius: 8px
+}
+
+.product .img-holder {
+    max-width: 180px;
+    width: 100%;
+    height: 100%;
+    border-radius: 8px;
+    overflow: hidden
+}
+
+.product .img-holder img {
+    width: 100%;
+    height: 100%;
+    display: block;
+    object-fit: cover;
+    -o-object-fit: cover
+}
+
+.product-text {
+    padding: 20px 25px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 16px
+}
+
+.product-text>* {
+    margin: 0
+}
+
+.product .btn-holder {
+    margin-top: 12px
+}
+
+.registration-completed .form-holder {
+    text-align: center
+}
+
+.registration-completed .form-holder h2 {
+    font-size: var(--size-h1)
+}
+
+.registration-completed .form-holder .btn-holder {
+    margin-top: 54px
+}
+
+.box {
+    background: linear-gradient(180deg, #24242f 0, #15131d 100%);
+    border-radius: 8px;
+    border: 1px solid #21222d
+}
+
+.profile-box {
+    padding: 30px 35px
+}
+
+.profile-box>p:has(strong) {
+    color: #c4c4c4
+}
+
+.profile-box .btn {
+    font-size: 10px;
+    min-height: 20px;
+    padding: 5px 20px;
+    border-radius: 6px
+}
+
+.table-info {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch
+}
+
+.table-row {
+    padding: 10px;
+    border-top: 1px solid #24242f;
+    display: flex;
+    align-items: center;
+    gap: 40px;
+    font-size: 12px
+}
+
+.table-row__name {
+    color: #c4c4c4;
+    flex-shrink: 0
+}
+
+.table-row__value {
+    font-weight: 500;
+    flex-grow: 1;
+    text-align: right
+}
+
+.profile {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-column-gap: 50px
+}
+
+.table-row .btn-holder {
+    min-width: 120px;
+    text-align: right
+}
+
+.table-gdpr .table-row__value {
+    display: inline-flex;
+    align-items: flex-end;
+    justify-content: flex-end;
+    gap: 8px
+}
+
+.profile-left,
+.profile-right {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 25px
+}
+
+.table-competition .table-row .btn-holder {
+    flex-shrink: 0
+}
+
+.table-row__match {
+    display: flex;
+    align-items: center;
+    flex-grow: 1;
+    flex-shrink: 0
+}
+
+.table-row__match::before {
+    content: "";
+    position: relative;
+    width: 15px;
+    height: 15px;
+    mask-image: url("/wp-content/themes/tipni/assets/images/cup.svg");
+    mask-repeat: no-repeat;
+    mask-size: 100%;
+    mask-position: center;
+    -webkit-mask-image: url("/wp-content/themes/tipni/assets/images/cup.svg");
+    -webkit-mask-repeat: no-repeat;
+    -webkit-mask-size: 100%;
+    -webkit-mask-position: center;
+    background-color: #fff;
+    margin-right: 22px;
+    flex-shrink: 0
+}
+
+.team {
+    display: flex;
+    align-items: center;
+    gap: 15px
+}
+
+.team.away {
+    flex-direction: row-reverse
+}
+
+.match-score {
+    margin: 0 10px
+}
+
+.logo-holder {
+    width: 20px;
+    height: 20px;
+    background: #a6a9B817;
+    border-radius: 5px;
+    display: flex;
+    align-items: center;
+    justify-content: center
+}
+
+.logo-holder img {
+    width: 13px;
+    height: 13px;
+    object-fit: contain
+}
+
+.profile-box.club input[type=search] {
+    width: 100%
+}
+
+.pagination {
+    display: flex;
+    align-items: center;
+    gap: 7px
+}
+
+.pagination-next,
+.pagination-prev {
+    position: relative;
+    width: 20px;
+    height: 20px;
+    background: #21222d;
+    border-radius: 5px;
+    cursor: pointer
+}
+
+.profile-box .pagination {
+    margin-top: 15px;
+    justify-content: flex-end
+}
+
+.pagination-next::before,
+.pagination-prev::before {
+    content: "";
+    mask-image: url("/wp-content/themes/tipni/assets/images/chevron-right.svg");
+    mask-repeat: no-repeat;
+    mask-size: 100%;
+    mask-position: center;
+    -webkit-mask-image: url("/wp-content/themes/tipni/assets/images/chevron-right.svg");
+    -webkit-mask-repeat: no-repeat;
+    -webkit-mask-size: 100%;
+    -webkit-mask-position: center;
+    position: absolute;
+    width: 3px;
+    height: 5px;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: #fff
+}
+
+.pagination-prev::before {
+    transform: translate(-50%, -50%) rotate(180deg)
+}
+
+.profile-box table {
+    width: 100%;
+    font-size: 12px;
+    border-collapse: collapse
+}
+
+.profile-box table tr th {
+    color: #c4c4c4;
+    font-weight: 400;
+    font-size: 10px
+}
+
+.profile-box table tr td {
+    padding: 5px 0;
+    text-align: center
+}
+
+.profile-box table tr {
+    border-bottom: 1px solid #24242f
+}
+
+.profile-box table tr th:first-child {
+    text-align: left
+}
+
+.profile-box table tbody>tr:first-child td {
+    padding-top: 16px
+}
+
+.profile-box table tr td:first-child {
+    text-align: left
+}
+
+.profile-box .not-paid,
+.profile-box .paid {
+    display: inline-block;
+    position: relative;
+    width: 16px;
+    height: 16px;
+    mask-repeat: no-repeat;
+    mask-position: center;
+    mask-size: contain;
+    -webkit-mask-repeat: no-repeat;
+    -webkit-mask-position: center;
+    -webkit-mask-size: contain
+}
+
+.profile-box .paid {
+    -webkit-mask-image: url("/wp-content/themes/tipni/assets/images/checkmark.svg");
+    mask-image: url("/wp-content/themes/tipni/assets/images/checkmark.svg");
+    background-color: #18ab00
+}
+
+.profile-box .not-paid {
+    -webkit-mask-image: url("/wp-content/themes/tipni/assets/images/x-circle.svg");
+    mask-image: url("/wp-content/themes/tipni/assets/images/x-circle.svg");
+    background-color: #ff004b
+}
+
+.profile-box table tr td:has(.not-paid),
+.profile-box table tr td:has(.paid) {
+    display: flex;
+    align-items: center;
+    justify-content: center
+}
+
+.dashboard {
+    display: flex;
+    gap: 95px
+}
+
+.dashboard-left {
+    flex: 0 0 460px
+}
+
+.league-switcher {
+    color: #a6a9b8;
+    list-style: none;
+    padding: 0;
+    margin: 30px 0;
+    display: flex;
+    align-items: baseline
+}
+
+.league-switcher li {
+    padding: 10px 20px;
+    cursor: pointer;
+    border-bottom: 1px solid #404247
+}
+
+.league-switcher li.active {
+    cursor: default;
+    color: #fff;
+    border-color: #fff
+}
+
+.matches-list:not(.active) {
+    display: none
+}
+
+.matches-list__inner {
+    display: flex;
+    flex-direction: column;
+    gap: 10px
+}
+
+.match {
+    background: linear-gradient(180deg, #24242f 0, #15131d 100%);
+    padding: 10px 30px;
+    border-radius: 8px;
+    border: 1px solid #21222d;
+    display: flex;
+    align-items: center;
+    gap: 15px 50px
+}
+
+.match-time {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px
+}
+
+.match-time__date {
+    color: #a6a9b8;
+    font-size: 10px
+}
+
+.match-score {
+    display: flex;
+    align-items: center
+}
+
+.matches .logo-holder {
+    width: 35px;
+    height: 35px
+}
+
+.logo-holder img {
+    width: 24px;
+    height: 24px
+}
+
+.matches .team {
+    gap: 25px
+}
+
+.matches .match-score {
+    margin: 0 20px
+}
+
+.match-info {
+    display: flex;
+    align-items: center
+}
+
+.prices {
+    margin: 60px auto 0
+}
+
+.prices-inner {
+    display: flex;
+    gap: 30px 60px
+}
+
+.price {
+    width: calc(33.333% - 40px);
+    background: linear-gradient(180deg, #24242f 0, #15131d 100%);
+    border-radius: 8px;
+    overflow: hidden
+}
+
+.price .img-holder img {
+    display: block;
+    aspect-ratio: 16/9;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    -o-object-fit: cover
+}
+
+.price-text {
+    padding: 35px 20px
+}
+
+.price-text h3 {
+    margin: 0 0 15px
+}
+
+.price-description {
+    line-height: 1.35
+}
+
+.window-switcher {
+    list-style: none;
+    padding: 0;
+    margin: 30px 0;
+    display: flex;
+    gap: 10px 20px
+}
+
+.window-switcher li {
+    color: #a6a9b8;
+    cursor: pointer
+}
+
+.window-switcher li.active {
+    color: #fff
+}
+
+.main-competition {
+    display: flex;
+    padding: 0 0 65px;
+    border-radius: 8px;
+    overflow: hidden;
+    background: linear-gradient(180deg, #24242f 0, #15131d 100%);
+    border: 1px solid #21222d
+}
+
+.main-competition .img-holder {
+    width: 370px;
+    max-width: 33.333%;
+    flex-shrink: 0
+}
+
+.main-competition .img-holder img {
+    aspect-ratio: 37/25;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block
+}
+
+.your-club h3 {
+    margin: 0
+}
+
+.your-club {
+    background: linear-gradient(180deg, #24242f 0, #15131d 100%);
+    padding: 15px 25px;
+    border-radius: 8px;
+    margin-bottom: 40px
+}
+
+.main-competition .competition-text {
+    padding: 25px 45px 0
+}
+
+.competitions .competition-text .subtitle {
+    margin: 0;
+    text-align: left;
+    max-width: 100%;
+    font-size: 10px;
+    font-weight: 700
+}
+
+.main-competition .competition-text h2 {
+    margin: 10px 0 15px
+}
+
+.main-competition .competition-description {
+    max-width: 600px
+}
+
+.main-competition .competition-text .btn-holder {
+    margin-top: 20px
+}
+
+.other-competitions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 32px;
+    margin-top: 40px
+}
+
+.competition {
+    border-radius: 8px;
+    overflow: hidden;
+    border: 1px solid #21222d;
+    width: calc(33.333% - 21.333px)
+}
+
+.competition-text {
+    padding: 15px 32px;
+    background: linear-gradient(180deg, #24242f 0, #15131d 100%)
+}
+
+.competition>.img-holder img {
+    display: block;
+    aspect-ratio: 7/3;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    -o-object-fit: cover
+}
+
+.competition h3 {
+    margin: 30px 0 15px
+}
+
+.competition .btn-holder {
+    margin-top: 16px
+}
+
+.two-columns {
+    display: flex;
+    gap: 40px
+}
+
+.two-columns__column.left {
+    flex-grow: 1
+}
+
+.two-columns__column.right {
+    flex-shrink: 0;
+    width: 310px
+}
+
+.round {
+    position: relative;
+    padding: 20px 140px 10px 30px;
+    background: linear-gradient(180deg, #24242f 0, #15131d 100%);
+    border: 1px solid #21222d;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    margin: 0 0 20px
+}
+
+.round>h3 {
+    margin: 0
+}
+
+.round-info {
+    display: flex;
+    align-items: baseline;
+    gap: 10px 30px
+}
+
+.pagination.big .pagination-next,
+.pagination.big .pagination-prev {
+    width: 40px;
+    height: 40px
+}
+
+.pagination.big .pagination-next::before,
+.pagination.big .pagination-prev::before {
+    width: 12px;
+    height: 12px
+}
+
+.round .pagination {
+    position: absolute;
+    top: 50%;
+    right: 35px;
+    transform: translateY(-50%)
+}
+
+.league-title {
+    padding: 20px 30px 10px;
+    background: linear-gradient(180deg, #24242f 0, #15131d 100%);
+    border: 1px solid #21222d;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    margin: 0 0 30px
+}
+
+.league-title h3 {
+    margin: 0
+}
+
+.league-title .window-switcher {
+    margin: 0
+}
+
+.league-matches:not(.active) {
+    display: none
+}
+
+.league-matches {
+    display: flex;
+    flex-direction: column;
+    gap: 20px
+}
+
+.league-matches .logo-holder {
+    width: 35px;
+    height: 35px
+}
+
+.odds {
+    display: flex;
+    gap: 12px;
+    margin-left: auto
+}
+
+.odds-button {
+    width: 35px;
+    height: 35px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: #a6a9B817;
+    border-radius: 12px
+}
+
+.odds-button.active {
+    background-color: #ec0000
+}
+
+/* Styling pro uložené tipy s ikonou zámku */
+.odds-button[data-saved="true"] {
+    cursor: not-allowed;
+    opacity: 0.8;
+    position: relative;
+}
+
+.odds-button[data-saved="true"]::after {
+    content: "🔒";
+    position: absolute;
+    top: -8px;
+    right: -8px;
+    font-size: 12px;
+}
+
+.odds-button[data-saved="true"]:not(.active) {
+    pointer-events: none;
+    opacity: 0.4;
+}
+
+.odds-button[data-saved="true"].active {
+    background-color: #18AB00;
+    border: 2px solid #18AB00;
+}
+
+/* Styling pro expirované zápasy s ikonou zámku */
+.odds-button[data-expired="true"] {
+    cursor: not-allowed !important;
+    opacity: 0.8 !important;
+    pointer-events: none !important;
+    position: relative;
+}
+
+.odds-button[data-expired="true"]::after {
+    content: "🔒";
+    position: absolute;
+    top: -8px;
+    right: -8px;
+    font-size: 12px;
+}
+
+.recap {
+    padding: 40px 30px;
+    background: linear-gradient(180deg, #24242f 0, #15131d 100%);
+    border-radius: 8px;
+    min-height: 800px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px
+}
+
+.matches-left {
+    margin-top: auto
+}
+
+.matches-recap .match {
+    padding: 0;
+    background: 0 0
+}
+
+.odd {
+    width: 35px;
+    height: 35px;
+    border-radius: 12px;
+    background-color: #ec0000;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0
+}
+
+.matches-recap .match-info {
+    gap: 10px
+}
+
+.matches-recap .match {
+    gap: 20px
+}
+
+.matches-recap {
+    display: flex;
+    flex-direction: column;
+    gap: 10px
+}
+
+.guessing-summary {
+    background: linear-gradient(180deg, #24242f 0, #15131d 100%);
+    border: 1px solid #21222d;
+    padding: 20px 30px 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    margin: 0 0 30px
+}
+
+.guessing-results .matches {
+    display: flex;
+    flex-direction: column;
+    gap: 10px
+}
+
+.guessing-results .matches .match-score {
+    font-size: var(--size-h4)
+}
+
+.guessing-results .matches .pagination {
+    justify-content: flex-end;
+    margin-top: 25px
+}
+
+.guessing-ranking table {
+    width: 100%;
+    border-spacing: 0 15px
+}
+
+.guessing-ranking table tr:not(:has(th)) {
+    background: linear-gradient(180deg, #24242f 0, #15131d 100%);
+    border: 1px solid #21222d
+}
+
+.guessing-ranking table tr th {
+    color: #c4c4c4;
+    font-weight: 700;
+    text-align: left;
+    padding: 0 5px
+}
+
+.guessing-ranking table tr td {
+    padding: 20px 12px
+}
+
+.guessing-ranking table tr td img {
+    vertical-align: bottom;
+    margin-left: 10px
+}
+
+.guessing-ranking table tr>td:first-child {
+    width: 120px
+}
+
+.guessing-ranking table tr>td:nth-child(2) {
+    width: 250px
+}
+
+.guessing-ranking table tr>td:last-child {
+    text-align: right;
+    font-weight: 700
+}
+
+.guessing-ranking .pagination {
+    margin-top: 50px;
+    justify-content: flex-end
+}
+
+.window-switcher__windows>div:not(.active) {
+    display: none
+}
+
+.competitions>.pagination {
+    justify-content: flex-end;
+    margin-top: 45px
+}
+
+.pagination>span {
+    margin-right: 25px;
+    color: #c4c4c4;
+    font-size: 10px
+}
+
+.description {
+    max-width: 625px;
+    margin: 0 auto;
+    text-align: center
+}
+
+.is-user-not-logged-in #header {
+    gap: 40px;
+}
+
+.is-user-not-logged-in #menu-hlavni-menu a {
+    font-size: .95rem;
+}
+
+@media (max-width:1199px) {
+    :root {
+        --container-width: 900px;
+        --narrow-container-width: 600px;
+        --size-h1: 36px;
+        --size-h2: 30px;
+        --size-h3: 20px;
+        --size-h4: 18px;
+        --size-body: 14px;
+        --size-smaller: 13px;
+        --size-small: 10px
+    }
+
+    .navigation {
+        gap: 20px
+    }
+
+    #header .logo {
+        max-width: 190px
+    }
+
+    #header {
+        gap: 40px
+    }
+
+    .competition-text,
+    .league-title,
+    .price-text,
+    .profile-box,
+    .recap {
+        padding: 20px
+    }
+
+    .other-competitions,
+    .prices-inner {
+        gap: 20px
+    }
+
+    .competition,
+    .price {
+        width: calc(33.333% - 13.3333px)
+    }
+
+    .competition h3 {
+        margin: 10px 0
+    }
+
+    .match {
+        padding: 10px 20px;
+        gap: 15px 20px
+    }
+
+    .round {
+        padding: 20px 140px 20px 20px
+    }
+
+    .team {
+        gap: 5px 10px;
+        align-items: center
+    }
+
+    .odds {
+        gap: 8px
+    }
+
+    .odd,
+    .odds-button {
+        width: 30px;
+        height: 30px;
+        border-radius: 5px
+    }
+
+    .pagination.big .pagination-next,
+    .pagination.big .pagination-prev {
+        width: 30px;
+        height: 30px
+    }
+
+    .match-info {
+        flex-shrink: 0
+    }
+
+    .league-matches .logo-holder,
+    .matches .logo-holder {
+        width: 25px;
+        height: 25px
+    }
+
+    .footer-bottom .logo img {
+        max-width: 150px
+    }
+
+    .guessing-ranking table tr td {
+        padding: 15px 12px
+    }
+
+    .form-holder {
+        padding: 30px 60px
+    }
+
+    .table-row {
+        gap: 20px
+    }
+
+    .table-row .btn-holder {
+        min-width: 80px
+    }
+
+    .table-row {
+        padding: 10px 0
+    }
+
+    input[type=search] {
+        min-height: 38px
+    }
+
+    .matches .match-score {
+        margin: 0 10px
+    }
+
+    .matches .team {
+        gap: 10px
+    }
+
+    .steps {
+        margin: 60px auto 50px
+    }
+
+    .registration-completed .form-holder h2 {
+        font-size: var(--size-h2)
+    }
+}
+
+@media (max-width:991px) {
+    :root {
+        --container-width: 100%;
+        --narrow-container-width: 100%;
+        --size-h1: 36px;
+        --size-h2: 30px;
+        --size-h3: 20px;
+        --size-h4: 18px;
+        --size-body: 14px;
+        --size-smaller: 13px;
+        --size-small: 10px
+    }
+
+    #header {
+        position: sticky;
+        top: 0;
+        padding: 0 20px;
+        height: 70px;
+        margin: 0 -20px;
+        border-radius: 0;
+        transition: background-color ease .3s;
+        z-index: 2;
+        border-bottom: 1px solid transparent
+    }
+
+    body.navigation-visible #header {
+        z-index: 3;
+        background: linear-gradient(180deg, #24242f 0, #15131d 100%);
+        box-shadow: 0 4px 10px rgba(0, 0, 0, .1);
+        border-bottom: 1px solid #fff
+    }
+
+    .scrolled #header {
+        background: linear-gradient(180deg, #24242f 0, #15131d 100%);
+        box-shadow: 0 4px 10px rgba(0, 0, 0, .1);
+        border-bottom: 1px solid #fff
+    }
+
+    .menu-navigation {
+        color: #fff;
+        font-weight: 700;
+        display: inline-flex;
+        align-items: center;
+        gap: 3px
+    }
+
+    .navigation-wrapper {
+        position: fixed;
+        top: 70px;
+        right: 0;
+        background: linear-gradient(180deg, #24242f 0, #15131d 100%);
+        height: 100vh;
+        width: 100%;
+        max-width: 500px;
+        z-index: 3;
+        transform: translateX(100%);
+        transition: transform ease .3s;
+        flex-direction: column;
+        align-items: flex-start;
+        padding: 40px;
+        gap: 20px;
+    }
+
+    .navigation-wrapper .header-cart {
+        order: -1;
+        margin-bottom: 20px;
+    }
+
+    body.navigation-visible .navigation-wrapper {
+        transform: translateX(0)
+    }
+
+    .navigation-visible .menu-navigation::after {
+        mask-image: url("/wp-content/themes/tipni/assets/images/close.svg");
+        -webkit-mask-image: url("/wp-content/themes/tipni/assets/images/close.svg");
+        mask-size: 15px;
+        -webkit-mask-size: 15px
+    }
+
+    .menu-navigation::after {
+        content: "";
+        position: relative;
+        display: inline-block;
+        width: 24px;
+        height: 24px;
+        mask-image: url("/wp-content/themes/tipni/assets/images/menu-hamburger.svg");
+        mask-repeat: no-repeat;
+        mask-position: center;
+        mask-size: contain;
+        -webkit-mask-image: url("/wp-content/themes/tipni/assets/images/menu-hamburger.svg");
+        -webkit-mask-repeat: no-repeat;
+        -webkit-mask-position: center;
+        -webkit-mask-size: contain;
+        background-color: #fff
+    }
+
+    .navigation {
+        list-style: none;
+        margin: 0;
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+        width: 100%
+    }
+
+    body.navigation-visible::before {
+        content: "";
+        position: fixed;
+        top: 0;
+        left: 0;
+        bottom: 0;
+        right: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, .6);
+        z-index: 2
+    }
+
+    .dashboard {
+        gap: 30px;
+        flex-direction: column
+    }
+
+    .dashboard-left {
+        flex: 0 0 auto
+    }
+
+    .competition,
+    .price {
+        width: calc(50% - 20px)
+    }
+
+    .other-competitions,
+    .prices-inner {
+        flex-wrap: wrap
+    }
+
+    .btn {
+        min-height: 32px
+    }
+
+    .main-competition .competition-text {
+        padding: 20px
+    }
+
+    .profile {
+        grid-template-columns: 1fr;
+        grid-row-gap: 30px
+    }
+
+    .steps li {
+        width: 18px;
+        height: 18px
+    }
+
+    .steps {
+        max-width: 500px
+    }
+
+    .products {
+        grid-column-gap: 30px;
+        grid-row-gap: 30px
+    }
+
+    .two-columns {
+        gap: 30px;
+        flex-direction: column
+    }
+
+    .two-columns__column.right {
+        width: 100%
+    }
+
+    .recap {
+        min-height: unset
+    }
+}
+
+@media (max-width:767px) {
+    :root {
+        --container-width: 100%;
+        --narrow-container-width: 100%;
+        --size-h1: 28px;
+        --size-h2: 24px;
+        --size-h3: 18px;
+        --size-h4: 16px;
+        --size-body: 14px;
+        --size-smaller: 12px;
+        --size-small: 10px
+    }
+
+    .footer-bottom__inner {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        gap: 30px
+    }
+
+    body {
+        padding-bottom: 20px
+    }
+
+    .footer-bottom h4 {
+        text-align: center
+    }
+
+    .competition,
+    .price {
+        width: auto;
+        flex: 1 0 300px
+    }
+
+    .guessing-ranking table tr>td:first-child {
+        width: 80px
+    }
+
+    .guessing-ranking table tr>td:nth-child(2) {
+        width: 150px
+    }
+
+    .guessing-summary {
+        padding: 20px
+    }
+
+    .match {
+        flex-wrap: wrap
+    }
+
+    .round {
+        padding: 20px
+    }
+
+    .round .pagination {
+        position: relative;
+        top: auto;
+        right: auto;
+        transform: none
+    }
+
+    .main-competition {
+        padding: 0;
+        flex-direction: column
+    }
+
+    .main-competition .img-holder {
+        width: 100%;
+        max-width: 100%
+    }
+
+    .form-holder {
+        padding: 20px
+    }
+
+    .login .column {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 15px;
+        margin-top: 0
+    }
+
+    .products {
+        grid-template-columns: 1fr;
+        grid-column-gap: 20px;
+        grid-row-gap: 20px
+    }
+
+    .registration-completed .form-holder>.img-holder img {
+        max-width: 40px
+    }
+
+    .league-switcher li {
+        padding: 10px;
+        flex-shrink: 0
+    }
+
+    .window-switcher li {
+        flex-shrink: 0
+    }
+
+    .league-switcher,
+    .window-switcher {
+        overflow: scroll
+    }
+}
+
+.registration-step {
+    display: none
+}
+
+.registration-step.active,
+.registration-step:first-child {
+    display: block
+}
+
+.club-results {
+    position: absolute;
+    width: calc(100% - 2px);
+    max-height: 200px;
+    overflow-y: auto;
+    background-color: #fff;
+    border: 1px solid #444;
+    border-top: none;
+    border-radius: 0 0 10px 10px;
+    z-index: 10;
+    box-shadow: 0 5px 10px rgba(0, 0, 0, .2);
+    margin-top: -10px
+}
+
+.club-item {
+    padding: 10px 15px;
+    cursor: pointer;
+    transition: background-color .2s ease;
+    color: #000
+}
+
+.club-item:hover {
+    background-color: #f5f5f5
+}
+
+.no-results {
+    padding: 10px 15px;
+    color: #666;
+    font-style: italic
+}
+
+label:has(input[type=checkbox]) {
+    cursor: pointer
+}
+
+label:has(input[type=checkbox]) span {
+    cursor: pointer
+}
+
+.edit-field-form {
+    width: 100%
+}
+
+.edit-field-form input[type=email],
+.edit-field-form input[type=tel],
+.edit-field-form input[type=text] {
+    width: 100%;
+    background-color: #fff;
+    color: #000;
+    border: 1px solid #555;
+    border-radius: 4px;
+    padding: 8px 10px;
+    margin-bottom: 10px
+}
+
+.edit-field-form .address-fields {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 10px
+}
+
+.edit-field-form .btn-holder {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px
+}
+
+.not-confirmed {
+    color: #ff443b
+}
+
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0, 0, 0, .7)
+}
+
+.modal-content {
+    position: relative;
+    background: linear-gradient(180deg, #24242f 0, #15131d 100%);
+    margin: 10% auto;
+    padding: 30px;
+    border-radius: 8px;
+    border: 1px solid #21222d;
+    max-width: 600px;
+    width: 90%;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, .5);
+    animation: modalSlideIn .3s ease
+}
+
+@keyframes modalSlideIn {
+    from {
+        transform: translateY(-50px);
+        opacity: 0
+    }
+
+    to {
+        transform: translateY(0);
+        opacity: 1
+    }
+}
+
+.close-modal {
+    position: absolute;
+    top: 10px;
+    right: 15px;
+    color: #a6a9b8;
+    font-size: 28px;
+    font-weight: 700;
+    cursor: pointer
+}
+
+.close-modal:hover {
+    color: #fff
+}
+
+.modal-content h3 {
+    margin-top: 0;
+    text-align: center;
+    margin-bottom: 20px
+}
+
+.customer-info,
+.order-summary,
+.payment-methods {
+    margin-bottom: 25px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid #404247
+}
+
+.modal-content h4 {
+    margin-bottom: 10px;
+    color: #a6a9b8
+}
+
+.payment-options {
+    display: flex;
+    flex-direction: column;
+    gap: 12px
+}
+
+.payment-options label {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: 400;
+    cursor: pointer
+}
+
+.payment-options input[type=radio] {
+    min-height: unset;
+    margin: 0
+}
+
+.modal-footer {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 20px
+}
+
+.single-product .product {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 2rem;
+}
+
+.single-product .woocommerce-tabs.wc-tabs-wrapper {
+    flex-basis: 100%;
+}
+
+.single-product .product .summary.entry-summary {
+    padding: 2rem;
+}
+
+.single-product button.single_add_to_cart_button.button.alt {
+    background: linear-gradient(90deg, #b93532 0, #ff443b 100%);
+    color: #fff;
+}
+
+.single-product button.single_add_to_cart_button.button.alt:hover {
+    text-decoration: underline;
+}
+
+@media (max-width:499px) {
+    .login-error {
+        color: #ff443b;
+        margin-top: 20px;
+        text-align: center;
+        font-weight: 500
+    }
+
+    .footer-bottom__inner>ul {
+        grid-template-columns: 1fr 1fr
+    }
+
+    .partners-inner {
+        gap: 20px
+    }
+
+    #footer {
+        margin-top: 60px
+    }
+
+    .guessing-ranking table tr td img {
+        max-width: 18px;
+        margin-left: 5px
+    }
+
+    .guessing-ranking table tr td {
+        padding: 10px
+    }
+
+    .guessing-ranking table tr>td:first-child {
+        width: 60px
+    }
+
+    .guessing-ranking table tr th {
+        font-size: var(--size-smaller)
+    }
+
+    .odds {
+        margin-left: 0
+    }
+
+    .round-info {
+        gap: 10px 20px;
+        flex-wrap: wrap
+    }
+
+    .guessing-ranking .pagination,
+    .guessing-results .matches .pagination {
+        margin-top: 20px
+    }
+
+    .table-row {
+        flex-wrap: wrap
+    }
+
+    .table-row .btn-holder {
+        min-width: unset
+    }
+
+    .column {
+        flex-direction: column
+    }
+
+    .column .label-holder {
+        width: 100%
+    }
+
+    .registration .btns-holder {
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 10px 20px
+    }
+
+    .registration-completed .form-holder .btn-holder {
+        margin-top: 30px
+    }
+}

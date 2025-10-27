@@ -1,0 +1,162 @@
+{
+    "key": "group_kola",
+    "title": "Informace o kole",
+    "fields": [
+        {
+            "key": "field_cislo_kola",
+            "label": "Číslo kola",
+            "name": "cislo_kola",
+            "aria-label": "",
+            "type": "number",
+            "instructions": "Zadejte číslo kola",
+            "required": 1,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "default_value": 1,
+            "min": 1,
+            "max": "",
+            "placeholder": "",
+            "step": 1,
+            "prepend": "",
+            "append": ""
+        },
+        {
+            "key": "field_datum_od",
+            "label": "Datum od",
+            "name": "datum_od",
+            "aria-label": "",
+            "type": "date_time_picker",
+            "instructions": "Začátek kola",
+            "required": 1,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "50",
+                "class": "",
+                "id": ""
+            },
+            "display_format": "d.m.Y H:i",
+            "return_format": "d.m.Y H:i",
+            "first_day": 1
+        },
+        {
+            "key": "field_datum_do",
+            "label": "Datum do",
+            "name": "datum_do",
+            "aria-label": "",
+            "type": "date_time_picker",
+            "instructions": "Konec kola",
+            "required": 1,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "50",
+                "class": "",
+                "id": ""
+            },
+            "display_format": "d.m.Y H:i",
+            "return_format": "d.m.Y H:i",
+            "first_day": 1
+        },
+        {
+            "key": "field_stav_kola",
+            "label": "Stav kola",
+            "name": "stav_kola",
+            "aria-label": "",
+            "type": "select",
+            "instructions": "",
+            "required": 1,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "choices": {
+                "planovano": "Plánováno",
+                "otevreno": "Otevřeno",
+                "probihajici": "Probíhající",
+                "uzavreno": "Uzavřeno"
+            },
+            "default_value": "planovano",
+            "return_format": "value",
+            "multiple": 0,
+            "allow_null": 0,
+            "ui": 1,
+            "ajax": 0,
+            "placeholder": ""
+        },
+        {
+            "key": "field_souteze_kola",
+            "label": "Soutěže",
+            "name": "souteze_kola",
+            "aria-label": "",
+            "type": "relationship",
+            "instructions": "Vyberte soutěže, do kterých toto kolo patří",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "post_type": [
+                "soutez"
+            ],
+            "taxonomy": "",
+            "filters": [
+                "search"
+            ],
+            "elements": "",
+            "min": "",
+            "max": "",
+            "return_format": "id"
+        },
+        {
+            "key": "field_zapasy_kola",
+            "label": "Zápasy kola",
+            "name": "zapasy_kola",
+            "aria-label": "",
+            "type": "relationship",
+            "instructions": "",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "post_type": [
+                "zapas"
+            ],
+            "taxonomy": "",
+            "filters": [
+                "search"
+            ],
+            "return_format": "id",
+            "min": "",
+            "max": "",
+            "elements": ""
+        }
+    ],
+    "location": [
+        [
+            {
+                "param": "post_type",
+                "operator": "==",
+                "value": "kolo"
+            }
+        ]
+    ],
+    "menu_order": 0,
+    "position": "normal",
+    "style": "default",
+    "label_placement": "top",
+    "instruction_placement": "label",
+    "hide_on_screen": "",
+    "active": true,
+    "description": "",
+    "show_in_rest": false
+}
