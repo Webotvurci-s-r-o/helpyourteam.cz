@@ -2117,7 +2117,7 @@ function tipnijinak_get_competition_leaderboard($competition_id, $limit = 10, $o
             if ($user) {
                 $result[] = array(
                     'user_id' => $entry->user_id,
-                    'name' => $user->display_name,
+                    'name' => $user->user_login,
                     'points' => intval($entry->total_points)
                 );
             }
@@ -2199,12 +2199,12 @@ function tipnijinak_get_competition_leaderboard($competition_id, $limit = 10, $o
         if ($user) {
             $result[] = array(
                 'user_id' => $user_id,
-                'name' => $user->display_name,
+                'name' => $user->user_login,
                 'points' => $points
             );
         }
     }
-    
+
     return $result;
 }
 
