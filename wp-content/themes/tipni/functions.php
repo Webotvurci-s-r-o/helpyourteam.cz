@@ -22,7 +22,25 @@ require_once get_template_directory() . '/inc/shop/woocommerce-hooks.php';
 // Include admin files
 if ( is_admin() ) {
     require_once get_template_directory() . '/inc/admin/class-match-import.php';
+    require_once get_template_directory() . '/inc/admin/admin-columns.php';
+    require_once get_template_directory() . '/inc/admin/kolo-validation.php';
+    require_once get_template_directory() . '/inc/admin/match-auto-evaluate.php';
 }
+
+/**
+ * Automatické odhlášení bez potvrzovací stránky
+ */
+function tipnijinak_logout_without_confirmation() {
+    if ( isset( $_GET['action'] ) && $_GET['action'] === 'logout' && isset( $_GET['_wpnonce'] ) ) {
+        // Ověření nonce
+        if ( wp_verify_nonce( $_GET['_wpnonce'], 'log-out' ) ) {
+            wp_logout();
+            wp_safe_redirect( home_url() );
+            exit;
+        }
+    }
+}
+add_action( 'init', 'tipnijinak_logout_without_confirmation' );
 
 /**
  * Enqueue scripts and styles.
@@ -183,7 +201,9 @@ function tipnijinak_register_post_types() {
         'publicly_queryable' => true,
         'show_ui'            => true,
         'show_in_menu'       => true,
-        'query_var'          => true,
+        // Změna query_var z 'kolo' na 'kolo_post' - aby nedocházelo ke konfliktu
+        // s URL parametrem ?kolo=X používaným na stránce soutěže pro výběr kola
+        'query_var'          => 'kolo_post',
         'rewrite'            => array( 'slug' => 'kolo' ),
         'capability_type'    => 'post',
         'has_archive'        => true,
@@ -725,8 +745,8 @@ function tipnijinak_process_registration() {
     
     // Automatické přihlášení uživatele
     wp_set_current_user($user_id);
-    wp_set_auth_cookie($user_id);
-    
+    wp_set_auth_cookie($user_id, true, is_ssl());
+
     // Odeslání úspěšné odpovědi - nyní nepřesměrováváme, zobrazíme čtvrtý krok s produkty
     wp_send_json_success(array(
         'message'      => __('Registrace byla úspěšná.', 'tipnijinak'),
@@ -752,13 +772,37 @@ function tipnijinak_search_clubs() {
         wp_send_json_error(array('message' => __('Nebyl zadán hledaný výraz.', 'tipnijinak')));
     }
     
-    // Vyhledání klubů (týmů)
+    // Získání child kategorií ligy s ID 46 (Oblíbená liga)
+    $child_leagues = get_terms(array(
+        'taxonomy' => 'liga',
+        'child_of' => 46,
+        'fields' => 'ids',
+        'hide_empty' => false,
+    ));
+
+    // Vyhledání klubů (týmů) - pouze z child kategorií Oblíbené ligy
     $args = array(
         'post_type' => 'tym',
         'posts_per_page' => 10,
+        'post_status' => 'publish',
         's' => $search_term,
     );
-    
+
+    // Filtrovat pouze týmy přiřazené k child ligám pod ID 46
+    if (!empty($child_leagues) && !is_wp_error($child_leagues)) {
+        $args['tax_query'] = array(
+            array(
+                'taxonomy' => 'liga',
+                'field' => 'term_id',
+                'terms' => $child_leagues,
+                'operator' => 'IN',
+            ),
+        );
+    } else {
+        // Pokud neexistují child ligy, nevrátit žádné výsledky
+        $args['post__in'] = array(0);
+    }
+
     $clubs_query = new WP_Query($args);
     $clubs = array();
     
@@ -783,32 +827,6 @@ function tipnijinak_search_clubs() {
         wp_reset_postdata();
     }
     
-    // Pokud nejsou žádné kluby, přidáme demonstrační data
-    if (empty($clubs)) {
-        $clubs = array(
-            array(
-                'id' => 1,
-                'name' => 'AC Sparta Praha',
-                'logo' => get_template_directory_uri() . '/assets/images/sparta-logo.png',
-            ),
-            array(
-                'id' => 2,
-                'name' => 'SK Slavia Praha',
-                'logo' => '',
-            ),
-            array(
-                'id' => 3,
-                'name' => 'FC Viktoria Plzeň',
-                'logo' => '',
-            ),
-            array(
-                'id' => 4,
-                'name' => 'FC Baník Ostrava',
-                'logo' => '',
-            ),
-        );
-    }
-    
     // Odeslání výsledků
     wp_send_json_success(array(
         'clubs' => $clubs,
@@ -821,16 +839,18 @@ add_action('wp_ajax_search_clubs', 'tipnijinak_search_clubs');
  * AJAX handler pro vytvoření nového klubu
  */
 function tipnijinak_create_new_club() {
-    // Ověření nonce
-    if (!isset($_POST['nonce']) || !wp_verify_nonce($_POST['nonce'], 'ajax_nonce')) {
+    // Ověření nonce - akceptuje 'ajax_nonce' (profil) i 'registrace_ajax' (registrace)
+    $nonce_valid = false;
+    if (isset($_POST['nonce'])) {
+        if (wp_verify_nonce($_POST['nonce'], 'ajax_nonce') || wp_verify_nonce($_POST['nonce'], 'registrace_ajax')) {
+            $nonce_valid = true;
+        }
+    }
+
+    if (!$nonce_valid) {
         wp_send_json_error(array('message' => __('Neplatný bezpečnostní token.', 'tipnijinak')));
     }
-    
-    // Kontrola přihlášení uživatele
-    if (!is_user_logged_in()) {
-        wp_send_json_error(array('message' => __('Pro vytvoření klubu musíte být přihlášeni.', 'tipnijinak')));
-    }
-    
+
     // Získání dat z formuláře
     $club_title = isset($_POST['club_title']) ? sanitize_text_field($_POST['club_title']) : '';
     $club_abbr = isset($_POST['club_abbr']) ? sanitize_text_field($_POST['club_abbr']) : '';
@@ -840,11 +860,39 @@ function tipnijinak_create_new_club() {
     if (empty($club_title)) {
         wp_send_json_error(array('message' => __('Název klubu je povinný.', 'tipnijinak')));
     }
-    
-    // Vytvoření nového týmu
+
+    // Kontrola, zda klub s podobným názvem už existuje (částečná shoda)
+    $force_create = isset($_POST['force_create']) && $_POST['force_create'] === '1';
+    $existing = new WP_Query(array(
+        'post_type' => 'tym',
+        's' => $club_title,
+        'post_status' => 'publish',
+        'posts_per_page' => 5,
+    ));
+    if (!$force_create && $existing->have_posts()) {
+        $suggestions = array();
+        while ($existing->have_posts()) {
+            $existing->the_post();
+            $logo_id = get_field('logo_tymu', get_the_ID());
+            $logo_url = (!empty($logo_id) && is_numeric($logo_id)) ? wp_get_attachment_url($logo_id) : '';
+            $suggestions[] = array(
+                'id' => get_the_ID(),
+                'name' => get_the_title(),
+                'logo' => $logo_url,
+            );
+        }
+        wp_reset_postdata();
+        wp_send_json_error(array(
+            'message' => __('Našli jsme podobné kluby. Vyberte existující klub nebo pokračujte v přidání nového.', 'tipnijinak'),
+            'similar_clubs' => $suggestions,
+        ));
+    }
+
+    // Force create = pending (admin schválí), jinak publish (žádná shoda nalezena)
+    $new_status = $force_create ? 'pending' : 'publish';
     $club_id = wp_insert_post(array(
         'post_title'    => $club_title,
-        'post_status'   => 'publish',
+        'post_status'   => $new_status,
         'post_type'     => 'tym',
     ));
     
@@ -884,6 +932,7 @@ function tipnijinak_create_new_club() {
     ));
 }
 add_action('wp_ajax_create_new_club', 'tipnijinak_create_new_club');
+add_action('wp_ajax_nopriv_create_new_club', 'tipnijinak_create_new_club');
 
 /**
  * Načtení JS skriptu pro stránku profilu
@@ -1220,9 +1269,10 @@ function tipnijinak_ajax_login() {
             'message' => __('Přihlášení proběhlo úspěšně, přesměrováváme...', 'tipnijinak'),
             'redirect' => $redirect_to
         ));
+        // wp_send_json_success() již obsahuje wp_die() uvnitř
     }
-    
-    // Ukončit zpracování
+
+    // Ukončit zpracování pro případ neúspěchu
     wp_die();
 }
 // Registrovat AJAX handler pro nepřihlášené i přihlášené uživatele
@@ -1395,8 +1445,15 @@ function tipnijinak_save_user_tips() {
                 $errors[] = sprintf(__('Zápas ID %d nepatří do vybraného kola.', 'tipnijinak'), $match_id);
                 continue;
             }
-            
-            // Zkontrolovat, zda pro tohoto uživatele a zápas už existuje tip
+
+            // Ověření, že zápas je otevřený pro tipování (plánovaný)
+            $match_status = get_field('stav_zapasu', $match_id);
+            if (in_array($match_status, array('ukonceny', 'probihajici', 'zrusen'))) {
+                $errors[] = sprintf(__('Na zápas ID %d již nelze tipovat.', 'tipnijinak'), $match_id);
+                continue;
+            }
+
+            // Zkontrolovat, zda pro tohoto uživatele, zápas a soutěž už existuje tip
             $existing_tip_args = array(
                 'post_type' => 'user_tip',
                 'posts_per_page' => 1,
@@ -1409,6 +1466,10 @@ function tipnijinak_save_user_tips() {
                     array(
                         'key' => 'tip_match',
                         'value' => $match_id,
+                    ),
+                    array(
+                        'key' => 'tip_competition',
+                        'value' => $competition_id,
                     )
                 )
             );
@@ -1480,9 +1541,10 @@ add_action('wp_ajax_tipnijinak_save_tips', 'tipnijinak_save_user_tips');
  * 
  * @param int $match_id ID zápasu
  * @param int $user_id ID uživatele (výchozí: aktuálně přihlášený uživatel)
+ * @param int $competition_id ID soutěže (volitelné - pokud zadáno, filtruje tipy podle soutěže)
  * @return string|bool Tip uživatele (1, 0, 2) nebo false pokud není nalezen
  */
-function tipnijinak_get_user_tip($match_id, $user_id = 0) {
+function tipnijinak_get_user_tip($match_id, $user_id = 0, $competition_id = 0) {
     if (!$match_id) {
         return false;
     }
@@ -1510,26 +1572,36 @@ function tipnijinak_get_user_tip($match_id, $user_id = 0) {
         
         return $tip !== null ? $tip : false;
     }
-    
+
     // Použít nový systém ukládání tipů jako CPT
+    $meta_query = array(
+        'relation' => 'AND',
+        array(
+            'key' => 'tip_user',
+            'value' => $user_id,
+        ),
+        array(
+            'key' => 'tip_match',
+            'value' => $match_id,
+        )
+    );
+
+    // Filtrovat podle soutěže, pokud je zadána
+    if ($competition_id) {
+        $meta_query[] = array(
+            'key' => 'tip_competition',
+            'value' => $competition_id,
+        );
+    }
+
     $args = array(
         'post_type' => 'user_tip',
         'posts_per_page' => 1,
-        'meta_query' => array(
-            'relation' => 'AND',
-            array(
-                'key' => 'tip_user',
-                'value' => $user_id,
-            ),
-            array(
-                'key' => 'tip_match',
-                'value' => $match_id,
-            )
-        )
+        'meta_query' => $meta_query
     );
-    
+
     $query = new WP_Query($args);
-    
+
     if ($query->have_posts()) {
         $query->the_post();
         $tip_value = get_field('tip_value');
@@ -1655,11 +1727,6 @@ function tipnijinak_evaluate_match($match_id) {
                     'key' => 'tip_match',
                     'value' => $match_id,
                 ),
-                array(
-                    'key' => 'tip_evaluated',
-                    'value' => '1',
-                    'compare' => '!='
-                )
             )
         );
         
@@ -1809,41 +1876,43 @@ function tipnijinak_get_user_points_for_match($match_id, $user_id = 0) {
  * @param int $user_id ID uživatele (výchozí: aktuálně přihlášený uživatel)
  * @return int Počet tipů
  */
-function tipnijinak_get_user_tips_count($competition_id, $user_id = 0) {
+function tipnijinak_get_user_tips_count($competition_id, $user_id = 0, $round_id = 0) {
     if (!$competition_id) {
         return 0;
     }
-    
+
     if (!$user_id && is_user_logged_in()) {
         $user_id = get_current_user_id();
     }
-    
+
     if (!$user_id) {
         return 0;
     }
-    
+
     // Podpora původního systému ukládání tipů do databáze
     if (defined('TIPNIJINAK_USE_DB_TIPS') && TIPNIJINAK_USE_DB_TIPS) {
         global $wpdb;
         $table_name = $wpdb->prefix . 'tipnijinak_tips';
-        
+
         // Kontrola, zda tabulka existuje
         $table_exists = $wpdb->get_var("SHOW TABLES LIKE '$table_name'") === $table_name;
         if (!$table_exists) {
             return 0;
         }
-        
-        $count = $wpdb->get_var(
-            $wpdb->prepare(
-                "SELECT COUNT(*) FROM $table_name WHERE user_id = %d AND competition_id = %d",
-                $user_id,
-                $competition_id
-            )
-        );
-        
+
+        $sql = "SELECT COUNT(*) FROM $table_name WHERE user_id = %d AND competition_id = %d";
+        $params = array($user_id, $competition_id);
+
+        if ($round_id) {
+            $sql .= " AND round_id = %d";
+            $params[] = $round_id;
+        }
+
+        $count = $wpdb->get_var($wpdb->prepare($sql, $params));
+
         return $count !== null ? intval($count) : 0;
     }
-    
+
     // Použít nový systém ukládání tipů jako CPT
     $args = array(
         'post_type' => 'user_tip',
@@ -1861,7 +1930,14 @@ function tipnijinak_get_user_tips_count($competition_id, $user_id = 0) {
             )
         )
     );
-    
+
+    if ($round_id) {
+        $args['meta_query'][] = array(
+            'key' => 'tip_round',
+            'value' => $round_id,
+        );
+    }
+
     $query = new WP_Query($args);
     return $query->found_posts;
 }
@@ -1873,19 +1949,19 @@ function tipnijinak_get_user_tips_count($competition_id, $user_id = 0) {
  * @param int $user_id ID uživatele (výchozí: aktuálně přihlášený uživatel)
  * @return int Celkový počet bodů
  */
-function tipnijinak_get_user_total_points($competition_id, $user_id = 0) {
+function tipnijinak_get_user_total_points($competition_id, $user_id = 0, $round_id = 0) {
     if (!$competition_id) {
         return 0;
     }
-    
+
     if (!$user_id && is_user_logged_in()) {
         $user_id = get_current_user_id();
     }
-    
+
     if (!$user_id) {
         return 0;
     }
-    
+
     // Použít nový systém ukládání tipů jako CPT (přeskočit databázovou verzi)
     $args = array(
         'post_type' => 'user_tip',
@@ -1906,6 +1982,13 @@ function tipnijinak_get_user_total_points($competition_id, $user_id = 0) {
             )
         )
     );
+
+    if ($round_id) {
+        $args['meta_query'][] = array(
+            'key' => 'tip_round',
+            'value' => $round_id,
+        );
+    }
     
     $query = new WP_Query($args);
     $total_points = 0;
@@ -1993,44 +2076,42 @@ function tipnijinak_get_user_total_points($competition_id, $user_id = 0) {
  * @param int $offset Offset pro stránkování
  * @return array Seznam uživatelů s jejich body
  */
-function tipnijinak_get_competition_leaderboard($competition_id, $limit = 10, $offset = 0) {
+function tipnijinak_get_competition_leaderboard($competition_id, $limit = 10, $offset = 0, $round_id = 0) {
     if (!$competition_id) {
         return array();
     }
-    
+
     // Podpora původního systému ukládání tipů do databáze
     if (defined('TIPNIJINAK_USE_DB_TIPS') && TIPNIJINAK_USE_DB_TIPS) {
         global $wpdb;
         $table_name = $wpdb->prefix . 'tipnijinak_points';
-        
+
         // Kontrola, zda tabulka existuje
         $table_exists = $wpdb->get_var("SHOW TABLES LIKE '$table_name'") === $table_name;
         if (!$table_exists) {
-            // Zkusíme tabulku vytvořit
             tipnijinak_create_tables_manually();
-            // Znovu zkontrolujeme
             $table_exists = $wpdb->get_var("SHOW TABLES LIKE '$table_name'") === $table_name;
             if (!$table_exists) {
                 return array();
             }
         }
-        
-        $leaderboard = $wpdb->get_results(
-            $wpdb->prepare(
-                "SELECT user_id, SUM(points) as total_points 
-                 FROM $table_name 
-                 WHERE competition_id = %d 
-                 GROUP BY user_id 
-                 ORDER BY total_points DESC, user_id ASC
-                 LIMIT %d OFFSET %d",
-                $competition_id,
-                $limit,
-                $offset
-            )
-        );
-        
+
+        $sql = "SELECT user_id, SUM(points) as total_points FROM $table_name WHERE competition_id = %d";
+        $params = array($competition_id);
+
+        if ($round_id) {
+            $sql .= " AND round_id = %d";
+            $params[] = $round_id;
+        }
+
+        $sql .= " GROUP BY user_id ORDER BY total_points DESC, user_id ASC LIMIT %d OFFSET %d";
+        $params[] = $limit;
+        $params[] = $offset;
+
+        $leaderboard = $wpdb->get_results($wpdb->prepare($sql, $params));
+
         $result = array();
-        
+
         foreach ($leaderboard as $entry) {
             $user = get_userdata($entry->user_id);
             if ($user) {
@@ -2041,14 +2122,11 @@ function tipnijinak_get_competition_leaderboard($competition_id, $limit = 10, $o
                 );
             }
         }
-        
+
         return $result;
-    } 
-    
+    }
+
     // Použít nový systém ukládání tipů jako CPT
-    // Pro efektivitu využijeme WordPress User Query a pak spočítáme body pro každého uživatele
-    
-    // Nejdříve získáme seznam všech uživatelů, kteří mají tipy v této soutěži
     $users_with_tips_args = array(
         'post_type' => 'user_tip',
         'posts_per_page' => -1,
@@ -2064,6 +2142,13 @@ function tipnijinak_get_competition_leaderboard($competition_id, $limit = 10, $o
             )
         )
     );
+
+    if ($round_id) {
+        $users_with_tips_args['meta_query'][] = array(
+            'key' => 'tip_round',
+            'value' => $round_id,
+        );
+    }
     
     $user_tips_query = new WP_Query($users_with_tips_args);
     
@@ -2390,59 +2475,135 @@ function tipnijinak_get_round_content() {
                 <div class="league-title">
                     <h3><?php esc_html_e('Liga', 'tipnijinak'); ?></h3>
                     <ul class="window-switcher">
-                        <?php foreach ($matches_by_league as $league_slug => $league_data) : ?>
-                        <li data="<?php echo esc_attr($league_slug); ?>" 
+                        <?php foreach ($matches_by_league as $league_slug => $league_data) :
+                            // Získat term objekt pro ligu a její obrázek
+                            $league_term = get_term_by('slug', $league_slug, 'liga');
+                            $league_image = null;
+
+                            if ($league_term && !is_wp_error($league_term)) {
+                                $image_field = get_field('obrazek_ligy', 'liga_' . $league_term->term_id);
+                                if ($image_field && isset($image_field['url'])) {
+                                    $league_image = $image_field['url'];
+                                }
+                            }
+                        ?>
+                        <li data="league-<?php echo esc_attr($league_slug); ?>"
                             class="<?php echo $league_slug === $active_league ? 'active' : ''; ?>">
+                            <?php if ($league_image) : ?>
+                                <img src="<?php echo esc_url($league_image); ?>" alt="<?php echo esc_attr($league_data['name']); ?>" class="league-icon">
+                            <?php endif; ?>
                             <?php echo esc_html($league_data['name']); ?>
                         </li>
                         <?php endforeach; ?>
                     </ul>
                 </div>
-                
+
                 <?php foreach ($matches_by_league as $league_slug => $league_data) : ?>
-                <div class="<?php echo esc_attr($league_slug); ?> <?php echo $league_slug === $active_league ? 'active' : ''; ?> league-matches">
-                    <?php foreach ($league_data['matches'] as $match) : 
-                        $user_tip = is_user_logged_in() ? tipnijinak_get_user_tip($match['id']) : false;
+                <div class="league-<?php echo esc_attr($league_slug); ?> <?php echo $league_slug === $active_league ? 'active' : ''; ?> league-matches">
+                    <?php foreach ($league_data['matches'] as $match) :
+                        $user_tip = is_user_logged_in() ? tipnijinak_get_user_tip($match['id'], 0, $competition_id) : false;
+                        $match_status = $match['status'] ?? 'planovany';
+                        $is_match_locked = in_array($match_status, array('ukonceny', 'probihajici', 'zrusen'));
                     ?>
-                    <div class="match" data-match-id="<?php echo esc_attr($match['id']); ?>" 
-                         data-match-date="<?php echo esc_attr($match['date']); ?>" 
+                    <div class="match <?php echo $is_match_locked ? 'match-locked' : ''; ?>" data-match-id="<?php echo esc_attr($match['id']); ?>"
+                         data-match-date="<?php echo esc_attr($match['date']); ?>"
                          data-match-time="<?php echo esc_attr($match['time']); ?>">
                         <div class="match-time">
                             <span class="match-time__hours"><?php echo esc_html($match['time']); ?></span>
                             <span class="match-time__date"><?php echo esc_html($match['date']); ?></span>
                         </div>
                         <div class="match-info">
-                            <div class="home team">
-                                <div class="team-name" title="<?php echo esc_attr($match['teams']['home']['name']); ?>"><?php echo esc_html($match['teams']['home']['abbreviation']); ?></div>
-                                <div class="logo-holder">
-                                    <?php if (!empty($match['teams']['home']['logo'])) : ?>
-                                        <img src="<?php echo esc_url($match['teams']['home']['logo']); ?>" alt="<?php echo esc_attr($match['teams']['home']['name']); ?>">
-                                    <?php endif; ?>
+                            <div class="match-teams">
+                                <div class="home team">
+                                    <div class="team-name" title="<?php echo esc_attr($match['teams']['home']['name']); ?>"><?php echo esc_html($match['teams']['home']['abbreviation']); ?></div>
+                                    <div class="logo-holder">
+                                        <?php if (!empty($match['teams']['home']['logo'])) : ?>
+                                            <img src="<?php echo esc_url($match['teams']['home']['logo']); ?>" alt="<?php echo esc_attr($match['teams']['home']['name']); ?>">
+                                        <?php endif; ?>
+                                    </div>
+                                </div>
+                                <div class="away team">
+                                    <div class="team-name" title="<?php echo esc_attr($match['teams']['away']['name']); ?>"><?php echo esc_html($match['teams']['away']['abbreviation']); ?></div>
+                                    <div class="logo-holder">
+                                        <?php if (!empty($match['teams']['away']['logo'])) : ?>
+                                            <img src="<?php echo esc_url($match['teams']['away']['logo']); ?>" alt="<?php echo esc_attr($match['teams']['away']['name']); ?>">
+                                        <?php endif; ?>
+                                    </div>
                                 </div>
                             </div>
                             <div class="match-score">
-                                <?php echo esc_html($match['score']); ?>
-                            </div>
-                            <div class="away team">
-                                <div class="team-name" title="<?php echo esc_attr($match['teams']['away']['name']); ?>"><?php echo esc_html($match['teams']['away']['abbreviation']); ?></div>
-                                <div class="logo-holder">
-                                    <?php if (!empty($match['teams']['away']['logo'])) : ?>
-                                        <img src="<?php echo esc_url($match['teams']['away']['logo']); ?>" alt="<?php echo esc_attr($match['teams']['away']['name']); ?>">
-                                    <?php endif; ?>
-                                </div>
+                                <?php
+                                $score_parts = explode(':', $match['score']);
+                                $home_score_display = isset($score_parts[0]) ? trim($score_parts[0]) : '-';
+                                $away_score_display = isset($score_parts[1]) ? trim($score_parts[1]) : '-';
+                                ?>
+                                <span class="score-home"><?php echo esc_html($home_score_display); ?></span>
+                                <span class="score-away"><?php echo esc_html($away_score_display); ?></span>
                             </div>
                         </div>
-                        
-                        <?php if ($current_round['stav_kola'] === 'otevreno' || $current_round['stav_kola'] === 'probihajici') : ?>
+
+                        <?php if ($is_match_locked) : ?>
+                            <?php if ($user_tip !== false) :
+                                $kurzy_locked = get_field('kurzy', $match['id']);
+                                $home_score_locked = get_field('skore_domaci', $match['id']);
+                                $away_score_locked = get_field('skore_hoste', $match['id']);
+                                $match_result_locked = null;
+                                if ($match_status === 'ukonceny' && $home_score_locked !== '' && $home_score_locked !== null && $away_score_locked !== '' && $away_score_locked !== null) {
+                                    $home_score_locked = intval($home_score_locked);
+                                    $away_score_locked = intval($away_score_locked);
+                                    if ($home_score_locked > $away_score_locked) {
+                                        $match_result_locked = '1';
+                                    } elseif ($home_score_locked < $away_score_locked) {
+                                        $match_result_locked = '2';
+                                    } else {
+                                        $match_result_locked = '0';
+                                    }
+                                }
+                            ?>
+                            <div class="odds">
+                                <div class="odds-button <?php echo ($user_tip === '1') ? 'active' : ''; ?>" data-saved="true">1</div>
+                                <div class="odds-button <?php echo ($user_tip === '0') ? 'active' : ''; ?>" data-saved="true">0</div>
+                                <div class="odds-button <?php echo ($user_tip === '2') ? 'active' : ''; ?>" data-saved="true">2</div>
+                            </div>
+                            <div class="odds-points">
+                                <?php
+                                $selected_odds_locked = 0;
+                                if ($user_tip === '1' && !empty($kurzy_locked['kurz_domaci'])) {
+                                    $selected_odds_locked = floatval($kurzy_locked['kurz_domaci']);
+                                } elseif ($user_tip === '0' && !empty($kurzy_locked['kurz_remiza'])) {
+                                    $selected_odds_locked = floatval($kurzy_locked['kurz_remiza']);
+                                } elseif ($user_tip === '2' && !empty($kurzy_locked['kurz_hoste'])) {
+                                    $selected_odds_locked = floatval($kurzy_locked['kurz_hoste']);
+                                }
+                                if ($selected_odds_locked > 0) {
+                                    $points_locked = tipnijinak_get_points_by_odds($selected_odds_locked);
+                                    if ($match_result_locked !== null) {
+                                        $is_correct_locked = ($user_tip === $match_result_locked);
+                                        $prefix = $is_correct_locked ? '+' : '-';
+                                        echo esc_html($prefix . $points_locked . ' ' . ($points_locked === 1 ? 'bod' : ($points_locked >= 2 && $points_locked <= 4 ? 'body' : 'bodů')));
+                                    } else {
+                                        if ($points_locked === 1) {
+                                            echo sprintf(__('%d bod', 'tipnijinak'), $points_locked);
+                                        } elseif ($points_locked >= 2 && $points_locked <= 4) {
+                                            echo sprintf(__('%d body', 'tipnijinak'), $points_locked);
+                                        } else {
+                                            echo sprintf(__('%d bodů', 'tipnijinak'), $points_locked);
+                                        }
+                                    }
+                                }
+                                ?>
+                            </div>
+                            <?php endif; ?>
+                        <?php elseif ($current_round['stav_kola'] === 'otevreno' || $current_round['stav_kola'] === 'probihajici') : ?>
                             <?php if (is_user_logged_in()) : ?>
                             <div class="odds">
-                                <?php 
+                                <?php
                                 // Získat kurzy pro tento zápas
                                 $kurzy = get_field('kurzy', $match['id']);
                                 // Kontrola, zda už má uživatel uložený tip
-                                $has_saved_tip = !empty($user_tip);
+                                $has_saved_tip = ($user_tip !== false);
                                 ?>
-                                <div class="odds-button <?php echo ($user_tip === '1') ? 'active' : ''; ?>" data-value="1" 
+                                <div class="odds-button <?php echo ($user_tip === '1') ? 'active' : ''; ?>" data-value="1"
                                     <?php if ($has_saved_tip) : ?>data-saved="true"<?php endif; ?>
                                     <?php if (!empty($kurzy['kurz_domaci'])) : ?>
                                     data-odds="<?php echo esc_attr($kurzy['kurz_domaci']); ?>"
@@ -2465,11 +2626,32 @@ function tipnijinak_get_round_content() {
                                 </div>
                             </div>
                             <div class="odds-points">
-                                <?php echo esc_html($body_text); ?>
+                                <?php
+                                if ($user_tip !== false) {
+                                    $selected_odds = 0;
+                                    if ($user_tip === '1' && !empty($kurzy['kurz_domaci'])) {
+                                        $selected_odds = floatval($kurzy['kurz_domaci']);
+                                    } elseif ($user_tip === '0' && !empty($kurzy['kurz_remiza'])) {
+                                        $selected_odds = floatval($kurzy['kurz_remiza']);
+                                    } elseif ($user_tip === '2' && !empty($kurzy['kurz_hoste'])) {
+                                        $selected_odds = floatval($kurzy['kurz_hoste']);
+                                    }
+                                    if ($selected_odds > 0) {
+                                        $points = tipnijinak_get_points_by_odds($selected_odds);
+                                        if ($points === 1) {
+                                            echo sprintf(__('%d bod', 'tipnijinak'), $points);
+                                        } elseif ($points >= 2 && $points <= 4) {
+                                            echo sprintf(__('%d body', 'tipnijinak'), $points);
+                                        } else {
+                                            echo sprintf(__('%d bodů', 'tipnijinak'), $points);
+                                        }
+                                    }
+                                }
+                                ?>
                             </div>
                             <?php else : ?>
                             <div class="login-required">
-                                <a href="<?php echo esc_url(wp_login_url(get_permalink($competition_id))); ?>" class="btn btn-small"><?php esc_html_e('Přihlásit se pro tipování', 'tipnijinak'); ?></a>
+                                <a href="<?php echo esc_url(wp_login_url(get_permalink($competition_id))); ?>" class="btn btn-small"><?php esc_html_e('Přihlásit se pro možnost tipovat', 'tipnijinak'); ?></a>
                             </div>
                             <?php endif; ?>
                         <?php endif; ?>
@@ -2560,7 +2742,7 @@ function tipnijinak_get_round_content() {
             
             <?php else : ?>
             <div class="login-to-tip">
-                <p><?php esc_html_e('Pro tipování se musíte přihlásit.', 'tipnijinak'); ?></p>
+                <p><?php esc_html_e('Pro možnost tipovat se musíte přihlásit.', 'tipnijinak'); ?></p>
                 <a href="<?php echo esc_url(wp_login_url(get_permalink($competition_id))); ?>" class="btn btn-primary"><?php esc_html_e('Přihlásit se', 'tipnijinak'); ?></a>
             </div>
             <?php endif; ?>
@@ -3221,13 +3403,20 @@ function tipnijinak_get_user_round_tips($round_id, $user_id = 0) {
     
     $tips = $wpdb->get_results(
         $wpdb->prepare(
-            "SELECT match_id, tip, kurz as odds FROM $table_name WHERE user_id = %d AND round_id = %d",
+            "SELECT match_id, tip FROM $table_name WHERE user_id = %d AND round_id = %d",
             $user_id,
             $round_id
         ),
         ARRAY_A
     );
-    
+
+    // Přidat odds = 0 pro kompatibilitu s ostatními funkcemi
+    if ($tips) {
+        foreach ($tips as &$tip) {
+            $tip['odds'] = 0;
+        }
+    }
+
     return $tips ? $tips : array();
 }
 
@@ -3275,11 +3464,22 @@ function tipnijinak_get_user_round_tips_alt($round_id, $user_id = 0) {
         while ($query->have_posts()) {
             $query->the_post();
             $post_id = get_the_ID();
-            
+
+            // Získat match_id a převést na int pokud je WP_Post objekt
+            $match_field = get_field('tip_match', $post_id);
+            $match_id = $match_field;
+            if (is_object($match_field) && isset($match_field->ID)) {
+                $match_id = $match_field->ID;
+            } elseif (is_array($match_field) && isset($match_field['ID'])) {
+                $match_id = $match_field['ID'];
+            }
+
             $tips[] = array(
-                'match_id' => get_field('tip_match', $post_id),
+                'match_id' => $match_id,
                 'tip' => get_field('tip_value', $post_id),
                 'odds' => get_field('tip_odds', $post_id) ?: 0,
+                'points' => get_field('tip_points', $post_id) ?: 0,
+                'evaluated' => get_field('tip_evaluated', $post_id) ?: false,
             );
         }
         wp_reset_postdata();
@@ -3295,57 +3495,94 @@ function tipnijinak_get_user_round_tips_alt($round_id, $user_id = 0) {
  * @param int $user_id ID uživatele (výchozí: aktuálně přihlášený uživatel)
  * @return int Umístění v žebříčku (pozice + 1)
  */
-function tipnijinak_get_user_ranking($competition_id, $user_id = 0) {
+function tipnijinak_get_user_ranking($competition_id, $user_id = 0, $round_id = 0) {
     if (!$competition_id) {
         return 0;
     }
-    
+
     if (!$user_id && is_user_logged_in()) {
         $user_id = get_current_user_id();
     }
-    
+
     if (!$user_id) {
         return 0;
     }
-    
-    global $wpdb;
-    $table_name = $wpdb->prefix . 'tipnijinak_points';
-    
-    // Kontrola, zda tabulka existuje
-    $table_exists = $wpdb->get_var("SHOW TABLES LIKE '$table_name'") === $table_name;
-    if (!$table_exists) {
-        // Zkusíme tabulku vytvořit
-        tipnijinak_create_tables_manually();
-        // Znovu zkontrolujeme
-        $table_exists = $wpdb->get_var("SHOW TABLES LIKE '$table_name'") === $table_name;
-        if (!$table_exists) {
-            return 0;
-        }
-    }
-    
-    // Získat celkové body všech uživatelů a seřadit je
-    $users_points = $wpdb->get_results(
-        $wpdb->prepare(
-            "SELECT user_id, SUM(points) as total_points 
-             FROM $table_name 
-             WHERE competition_id = %d 
-             GROUP BY user_id 
-             ORDER BY total_points DESC, user_id ASC",
-            $competition_id
+
+    // Použít CPT systém - získat všechny vyhodnocené tipy pro soutěž
+    $users_with_tips_args = array(
+        'post_type' => 'user_tip',
+        'posts_per_page' => -1,
+        'fields' => 'ids',
+        'meta_query' => array(
+            array(
+                'key' => 'tip_competition',
+                'value' => $competition_id,
+            ),
+            array(
+                'key' => 'tip_evaluated',
+                'value' => '1',
+            )
         )
     );
-    
-    if (empty($users_points)) {
-        return 0; // Žádní uživatelé v žebříčku
+
+    if ($round_id) {
+        $users_with_tips_args['meta_query'][] = array(
+            'key' => 'tip_round',
+            'value' => $round_id,
+        );
     }
-    
-    // Najít pozici uživatele v žebříčku
-    foreach ($users_points as $position => $entry) {
-        if ($entry->user_id == $user_id) {
-            return $position + 1; // Pozice + 1, protože indexujeme od 0
+
+    $user_tips_query = new WP_Query($users_with_tips_args);
+
+    if (!$user_tips_query->have_posts()) {
+        return 0;
+    }
+
+    $tip_ids = $user_tips_query->posts;
+    $users_points = array();
+
+    // Pro každý tip získáme ID uživatele a body
+    foreach ($tip_ids as $tip_id) {
+        $tip_user_id = get_field('tip_user', $tip_id);
+        $points = intval(get_field('tip_points', $tip_id));
+
+        // Ujistíme se, že user_id je integer
+        if (is_object($tip_user_id) && isset($tip_user_id->ID)) {
+            $tip_user_id = $tip_user_id->ID;
+        } elseif (is_array($tip_user_id) && isset($tip_user_id['ID'])) {
+            $tip_user_id = $tip_user_id['ID'];
+        } else {
+            $tip_user_id = intval($tip_user_id);
         }
+
+        // Přeskočíme neplatné user_id
+        if ($tip_user_id <= 0) {
+            continue;
+        }
+
+        if (!isset($users_points[$tip_user_id])) {
+            $users_points[$tip_user_id] = 0;
+        }
+
+        $users_points[$tip_user_id] += $points;
     }
-    
+
+    if (empty($users_points)) {
+        return 0;
+    }
+
+    // Seřadit uživatele podle bodů sestupně
+    arsort($users_points);
+
+    // Najít pozici uživatele v žebříčku
+    $position = 1;
+    foreach ($users_points as $uid => $total_points) {
+        if ($uid == $user_id) {
+            return $position;
+        }
+        $position++;
+    }
+
     return 0; // Uživatel není v žebříčku
 }
 
@@ -3410,3 +3647,72 @@ function tipnijinak_svg_thumbs($response, $attachment, $meta) {
     return $response;
 }
 add_filter('wp_prepare_attachment_for_js', 'tipnijinak_svg_thumbs', 10, 3);
+
+/**
+ * Automatické generování titulu zápasu při uložení
+ * Formát: {Domácí tým} – {Hosté} | {datum} {čas}
+ *
+ * Používá acf/save_post hook, který se spouští PO uložení ACF polí,
+ * takže funguje i při prvním vytvoření postu (ne jen při updatu).
+ */
+function tipnijinak_auto_generate_match_title($post_id) {
+    // Kontrola post type
+    if (get_post_type($post_id) !== 'zapas') {
+        return;
+    }
+
+    // Nekontrolovat při autosave
+    if (defined('DOING_AUTOSAVE') && DOING_AUTOSAVE) {
+        return;
+    }
+
+    // Nekontrolovat revize
+    if (wp_is_post_revision($post_id)) {
+        return;
+    }
+
+    // Získat ACF data
+    $domaci_tym_id = get_field('domaci_tym', $post_id);
+    $hoste_tym_id = get_field('hoste_tym', $post_id);
+    $datum_zapasu = get_field('datum_zapasu', $post_id);
+
+    // Pokud nemáme oba týmy, neměnit titul
+    if (!$domaci_tym_id || !$hoste_tym_id) {
+        return;
+    }
+
+    // Získat názvy týmů
+    $domaci_nazev = get_the_title($domaci_tym_id);
+    $hoste_nazev = get_the_title($hoste_tym_id);
+
+    // Vytvořit základní titul
+    $new_title = $domaci_nazev . ' – ' . $hoste_nazev;
+
+    // Přidat datum pokud existuje
+    if ($datum_zapasu) {
+        $timestamp = strtotime($datum_zapasu);
+        if ($timestamp) {
+            $date_formatted = date('d.m.Y H:i', $timestamp);
+            $new_title .= ' | ' . $date_formatted;
+        }
+    }
+
+    // Zkontrolovat jestli se titul skutečně změnil
+    $current_title = get_the_title($post_id);
+    if ($current_title === $new_title) {
+        return;
+    }
+
+    // Odstranit hook aby nedošlo k nekonečné smyčce
+    remove_action('acf/save_post', 'tipnijinak_auto_generate_match_title', 20);
+
+    // Aktualizovat titul
+    wp_update_post(array(
+        'ID' => $post_id,
+        'post_title' => $new_title
+    ));
+
+    // Znovu přidat hook
+    add_action('acf/save_post', 'tipnijinak_auto_generate_match_title', 20);
+}
+add_action('acf/save_post', 'tipnijinak_auto_generate_match_title', 20);

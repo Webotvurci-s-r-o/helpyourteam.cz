@@ -1,11 +1,17 @@
 // JavaScript pro interakci s tlačítky tipů a AJAX ukládání
 document.addEventListener('DOMContentLoaded', function() {
-    // Definice proměnných na začátku pro správný scope
-    const matchesRecap = document.querySelector('.matches-recap');
-    const matchesLeftElement = document.querySelector('.matches-left');
-    
+    // Funkce pro získání aktuálních DOM referencí (po AJAX se mění)
+    function getMatchesRecap() {
+        return document.querySelector('.matches-recap');
+    }
+    function getMatchesLeftElement() {
+        return document.querySelector('.matches-left');
+    }
+
     // Funkce pro aktualizaci počtu zbývajících zápasů
     function updateRemainingMatches() {
+        const matchesRecap = getMatchesRecap();
+        const matchesLeftElement = getMatchesLeftElement();
         if (!matchesRecap || !matchesLeftElement) return;
         
         const maxTips = tipnijinak_vars.max_tips || 15; // Maximální počet tipů
@@ -28,8 +34,9 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Funkce pro aktualizaci rekapitulace tipů v sidebaru
     function updateMatchesRecap(matchId, tipValue) {
+        const matchesRecap = getMatchesRecap();
         if (!matchesRecap) return;
-        
+
         // Hledat zápas v rekapitulaci
         let matchFound = false;
         const matchElements = matchesRecap.querySelectorAll('.match');
@@ -106,7 +113,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     // Inicializovat počítadlo zbývajících zápasů při načtení stránky
-    if (matchesRecap && matchesLeftElement) {
+    if (getMatchesRecap() && getMatchesLeftElement()) {
         updateRemainingMatches();
     }
     
@@ -170,19 +177,21 @@ document.addEventListener('DOMContentLoaded', function() {
                 this.classList.add('active');
                 
                 // Přidat aktivní třídu odpovídajícímu oknu ligy
+                // leagueData už obsahuje prefix "league-" (např. "league-1-cesko")
                 const targetLeagueWindow = document.querySelector('.' + leagueData + '.league-matches');
                 if (targetLeagueWindow) {
                     targetLeagueWindow.classList.add('active');
                 }
-                
-                // Aktualizovat URL s parametrem liga
+
+                // Aktualizovat URL s parametrem liga (bez prefixu league-)
                 const url = new URL(window.location.href);
-                url.searchParams.set('liga', leagueData);
+                const ligaParam = leagueData.replace('league-', '');
+                url.searchParams.set('liga', ligaParam);
                 history.pushState({}, '', url);
             });
         });
     }
-    
+
     // Inicializovat event listenery při načtení stránky
     initRoundNavigation();
     initOddsButtons();
@@ -379,19 +388,20 @@ document.addEventListener('DOMContentLoaded', function() {
                     this.classList.add('selected');
                 } else {
                     // Pokud bylo aktivní, odstranit ho z rekapitulace
-                    if (matchId && matchesRecap) {
-                        const matchInRecap = matchesRecap.querySelector(`.match-info[data-match-id="${matchId}"]`);
+                    const currentRecap = getMatchesRecap();
+                    if (matchId && currentRecap) {
+                        const matchInRecap = currentRecap.querySelector(`.match-info[data-match-id="${matchId}"]`);
                         if (matchInRecap) {
                             matchInRecap.closest('.match').remove();
-                            
+
                             // Pokud není žádný tip, zobrazit zprávu
-                            if (matchesRecap.querySelectorAll('.match').length === 0) {
+                            if (currentRecap.querySelectorAll('.match').length === 0) {
                                 const noTipsDiv = document.createElement('div');
                                 noTipsDiv.className = 'no-tips-yet';
                                 noTipsDiv.innerHTML = '<p>Zatím jste neprovedli žádné tipy.</p>';
-                                matchesRecap.appendChild(noTipsDiv);
+                                currentRecap.appendChild(noTipsDiv);
                             }
-                            
+
                             // Aktualizovat počet zbývajících zápasů
                             updateRemainingMatches();
                         }
@@ -431,8 +441,8 @@ document.addEventListener('DOMContentLoaded', function() {
                         console.error('Error fetching points:', error);
                     });
                 } else if (oddsPointsElement) {
-                    // Pokud není vybraný žádný tip, vrátit výchozí text
-                    oddsPointsElement.textContent = tipnijinak_vars.body_text || '30 bodů';
+                    // Pokud není kurz, nezobrazovat nic
+                    oddsPointsElement.textContent = '';
                 }
                 
                 // Pokud jsou k dispozici ID zápasu a hodnota tipu, aktualizovat rekapitulaci
@@ -469,14 +479,16 @@ document.addEventListener('DOMContentLoaded', function() {
                     this.classList.add('active');
                     
                     // Přidat aktivní třídu odpovídajícímu oknu ligy
-                    const targetLeagueWindow = document.querySelector('.league-' + leagueData + '.league-matches');
+                    // leagueData už obsahuje prefix "league-" (např. "league-1-cesko")
+                    const targetLeagueWindow = document.querySelector('.' + leagueData + '.league-matches');
                     if (targetLeagueWindow) {
                         targetLeagueWindow.classList.add('active');
                     }
-                    
-                    // Aktualizovat URL s parametrem liga
+
+                    // Aktualizovat URL s parametrem liga (bez prefixu league-)
                     const url = new URL(window.location.href);
-                    url.searchParams.set('liga', leagueData);
+                    const ligaParam = leagueData.replace('league-', '');
+                    url.searchParams.set('liga', ligaParam);
                     history.pushState({}, '', url);
                 });
             });
@@ -645,6 +657,28 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Inicializovat lightbox pro obrázky cen
     initPrizeLightbox();
+
+    // Mobile recap toggle
+    (function() {
+        var recap = document.querySelector('.two-columns__column.right.recap');
+        var toggleBtn = document.querySelector('.toggle-recap-tips');
+        if (!recap || !toggleBtn) return;
+
+        // Create overlay
+        var overlay = document.createElement('div');
+        overlay.className = 'recap-overlay';
+        document.body.appendChild(overlay);
+
+        function toggleRecap() {
+            var expanded = recap.classList.toggle('expanded');
+            overlay.classList.toggle('active', expanded);
+            toggleBtn.textContent = expanded ? 'Skrýt tipy' : 'Zobrazit tipy';
+            document.body.style.overflow = expanded ? 'hidden' : '';
+        }
+
+        toggleBtn.addEventListener('click', toggleRecap);
+        overlay.addEventListener('click', toggleRecap);
+    })();
 });
 
 // Funkce pro inicializaci lightbox pro obrázky cen

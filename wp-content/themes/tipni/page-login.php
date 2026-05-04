@@ -9,9 +9,17 @@ if ( ! defined( 'ABSPATH' ) ) {
     exit; // Exit if accessed directly.
 }
 
-// Pokud je uživatel již přihlášený, přesměruj ho na hlavní stránku
+// Zakázat cachování přihlašovací stránky
+header('Cache-Control: no-store, no-cache, must-revalidate, max-age=0');
+header('Cache-Control: post-check=0, pre-check=0', false);
+header('Pragma: no-cache');
+
+// Získat redirect URL z parametru nebo použít home
+$redirect_to = isset($_GET['redirect_to']) ? esc_url_raw($_GET['redirect_to']) : home_url();
+
+// Pokud je uživatel již přihlášený, přesměruj ho
 if (is_user_logged_in()) {
-    wp_redirect(home_url());
+    wp_redirect($redirect_to);
     exit;
 }
 
@@ -40,7 +48,7 @@ get_header();
                         <?php esc_html_e('Registrace', 'tipnijinak'); ?>
                     </a>
                     <button class="btn btn-primary" type="submit" id="login-submit"><?php esc_html_e('Přihlásit se', 'tipnijinak'); ?></button>
-                    <input type="hidden" name="redirect_to" value="<?php echo esc_url(home_url()); ?>" />
+                    <input type="hidden" name="redirect_to" value="<?php echo esc_url($redirect_to); ?>" />
                     <?php wp_nonce_field('ajax-login-nonce', 'security'); ?>
                 </div>
             </div>

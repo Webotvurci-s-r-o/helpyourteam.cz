@@ -14,6 +14,7 @@ $current_user = wp_get_current_user();
 $user_id = $current_user->ID;
 
 // Základní informace
+$username = $current_user->user_login;
 $first_name = get_user_meta($user_id, 'first_name', true);
 $last_name = get_user_meta($user_id, 'last_name', true);
 $email = $current_user->user_email;
@@ -63,6 +64,11 @@ get_header();
             <div class="profile-box box basic-info">
                 <p><strong>Základní informace</strong></p>
                 <div class="table-info table-basic-info">
+                    <div class="table-row">
+                        <span class="table-row__name">Uživatelské jméno</span>
+                        <span class="table-row__value"><?php echo esc_html($username); ?></span>
+                        <div class="btn-holder"></div>
+                    </div>
                     <div class="table-row">
                         <span class="table-row__name">Jméno</span>
                         <span class="table-row__value"><?php echo esc_html($first_name); ?></span>
@@ -191,6 +197,7 @@ get_header();
         <div class="profile-right">
             <div class="box profile-box club">
                 <p><strong>KLUB</strong></p>
+                <p class="club-note">Váš oblíbený klub z nižší soutěže (3.liga max.)</p>
                 <div class="club-search-container">
                     <input type="search" id="profile-club-search" placeholder="Vyhledat klub" value="<?php echo esc_attr($club_name); ?>">
                     <a href="#" id="add-new-club" class="btn btn-primary btn-sm">Přidat klub</a>
@@ -254,6 +261,7 @@ get_header();
                                 <?php
                                 $ligy = get_terms(array(
                                     'taxonomy' => 'liga',
+                                    'child_of' => 46,
                                     'hide_empty' => false,
                                 ));
                                 

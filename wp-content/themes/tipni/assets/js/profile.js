@@ -289,9 +289,58 @@ jQuery(document).ready(function($) {
                 if (response.success) {
                     // Skrytí modálu
                     $('#add-club-modal').hide();
-                    
+
                     // Nastavení vytvořeného klubu jako oblíbeného
                     saveSelectedClub(response.data.club_id, clubTitle);
+                } else if (response.data && response.data.similar_clubs) {
+                    // Found similar clubs - show suggestions
+                    var html = '<div class="similar-clubs-warning">';
+                    html += '<p><strong>' + response.data.message + '</strong></p>';
+                    html += '<ul class="similar-clubs-list">';
+                    response.data.similar_clubs.forEach(function(club) {
+                        html += '<li>';
+                        if (club.logo) {
+                            html += '<img src="' + club.logo + '" alt="" style="width:20px;height:20px;object-fit:contain;margin-right:8px;vertical-align:middle;">';
+                        }
+                        html += '<span>' + club.name + '</span> ';
+                        html += '<button type="button" class="btn btn-primary btn-sm select-existing-club" data-id="' + club.id + '" data-name="' + club.name + '">Vybrat</button>';
+                        html += '</li>';
+                    });
+                    html += '</ul>';
+                    html += '<button type="button" class="btn btn-secondary btn-sm force-create-club">Přesto přidat nový klub</button>';
+                    html += '</div>';
+                    $('#add-club-form .similar-clubs-warning').remove();
+                    $('#add-club-form').prepend(html);
+                    $('#add-club-form button[type="submit"]').prop('disabled', false).text('Přidat klub');
+
+                    // Select existing club handler
+                    $('.select-existing-club').on('click', function(e) {
+                        e.preventDefault();
+                        var id = $(this).data('id');
+                        var name = $(this).data('name');
+                        $('#add-club-modal').hide();
+                        $('.similar-clubs-warning').remove();
+                        saveSelectedClub(id, name);
+                    });
+
+                    // Force create handler
+                    $('.force-create-club').on('click', function() {
+                        $('.similar-clubs-warning').remove();
+                        formData.append('force_create', '1');
+                        $.ajax({
+                            type: 'POST',
+                            url: ajax_object.ajax_url,
+                            data: formData,
+                            processData: false,
+                            contentType: false,
+                            success: function(resp) {
+                                if (resp.success) {
+                                    $('#add-club-modal').hide();
+                                    saveSelectedClub(resp.data.club_id, clubTitle);
+                                }
+                            }
+                        });
+                    });
                 } else {
                     alert(response.data.message || 'Došlo k chybě při vytváření klubu.');
                     $('#add-club-form button[type="submit"]').prop('disabled', false).text('Přidat klub');

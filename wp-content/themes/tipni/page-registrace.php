@@ -83,7 +83,11 @@ get_header();
             <form class="registration step-3" id="registration-form-3">
                 <div class="label-holder">
                     <label for="club-search">Vyberte svůj oblíbený klub</label>
-                    <input type="search" id="club-search" name="club_search" placeholder="Vyhledat klub">
+                    <p class="club-note">Váš oblíbený klub z nižší soutěže (3.liga max.)</p>
+                    <div class="club-search-container">
+                        <input type="search" id="club-search" name="club_search" placeholder="Vyhledat klub">
+                        <a href="#" id="add-new-club" class="btn btn-primary btn-sm">Přidat klub</a>
+                    </div>
                     <input type="hidden" id="selected-club" name="selected_club">
                 </div>
                 <div class="label-holder">
@@ -113,9 +117,9 @@ get_header();
         <!-- Krok 4: Nákup produktu -->
         <div class="registration-step  " id="step-4" style="display: none;">
             <h3>Nákup produktu</h3>
-            <div class="subtitle">
+            <!-- <div class="subtitle">
                 Vyberte si produkt, který vám nejvíce vyhovuje. Získejte přístup k našim tipovacím soutěžím a staňte se součástí naší komunity.
-            </div>
+            </div> -->
             
             <div class="products">
                 <?php
@@ -229,6 +233,55 @@ get_header();
                 <button type="button" class="btn btn-secondary" id="cancel-order">Zrušit</button>
                 <button type="button" class="btn btn-primary" id="confirm-order">Potvrdit objednávku</button>
             </div>
+        </div>
+    </div>
+
+    <!-- Modal pro přidání nového klubu -->
+    <div id="add-club-modal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <span class="close-modal">&times;</span>
+            <h3>Přidat nový klub</h3>
+            <form id="add-club-form" enctype="multipart/form-data">
+                <div class="form-group">
+                    <label for="club_title">Název klubu</label>
+                    <input type="text" id="club_title" name="club_title" required>
+                </div>
+                <div class="form-group">
+                    <label for="club_logo">Logo klubu</label>
+                    <div class="file-input-wrapper">
+                        <input type="file" id="club_logo" name="club_logo" accept="image/*" class="file-input">
+                        <div class="file-input-custom">
+                            <span class="file-input-text">Vybrat soubor</span>
+                            <div class="file-input-preview"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="club_abbr">Zkratka klubu</label>
+                    <input type="text" id="club_abbr" name="club_abbr">
+                </div>
+                <div class="form-group">
+                    <label for="club_league">Liga</label>
+                    <select id="club_league" name="club_league">
+                        <?php
+                        $ligy = get_terms(array(
+                            'taxonomy' => 'liga',
+                            'child_of' => 46,
+                            'hide_empty' => false,
+                        ));
+
+                        if (!empty($ligy) && !is_wp_error($ligy)) {
+                            foreach ($ligy as $liga) {
+                                echo '<option value="' . esc_attr($liga->term_id) . '">' . esc_html($liga->name) . '</option>';
+                            }
+                        }
+                        ?>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <button type="submit" class="btn btn-primary">Přidat klub</button>
+                </div>
+            </form>
         </div>
     </div>
 </div>

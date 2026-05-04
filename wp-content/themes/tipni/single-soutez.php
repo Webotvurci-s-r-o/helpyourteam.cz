@@ -63,13 +63,13 @@ extract($competition_data); // Extract variables for backward compatibility
         
         <!-- Tab content -->
         <div class="window-switcher__windows">
-            <?php 
-            // DEBUG: Check template parts loading
-            if (current_user_can('administrator')) {
+            <?php
+            // DEBUG: Check template parts loading - VYPNUTO
+            /*if (current_user_can('administrator')) {
                 echo '<div style="background: red; color: white; padding: 10px;">DEBUG: Loading template parts...</div>';
                 echo '<div style="background: blue; color: white; padding: 5px;">Template dir: ' . get_template_directory() . '</div>';
-            }
-            
+            }*/
+
             // Load template parts with competition data
             get_template_part('template-parts/competition/prizes-tab', null, $competition_data);
             get_template_part('template-parts/competition/betting-tab', null, $competition_data);

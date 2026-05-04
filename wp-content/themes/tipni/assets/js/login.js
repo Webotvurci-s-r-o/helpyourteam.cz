@@ -46,8 +46,19 @@ jQuery(document).ready(function($) {
             error: function(xhr, status, error) {
                 console.log('AJAX error:', status, error);
                 console.log('Response text:', xhr.responseText);
+                console.log('HTTP status:', xhr.status);
                 $('.login-loading').hide();
-                $('.login-error').html('<strong>' + tipnijinak_ajax.error_text + ':</strong> ' + tipnijinak_ajax.server_error).show();
+
+                // Kontrola na expirovaný nonce (WordPress vrací "-1")
+                if (xhr.responseText === '-1' || xhr.status === 403) {
+                    $('.login-error').html('<strong>Chyba:</strong> Stránka je zastaralá. Obnovuji stránku...').show();
+                    // Automaticky reload po 2 sekundách
+                    setTimeout(function() {
+                        window.location.reload();
+                    }, 2000);
+                } else {
+                    $('.login-error').html('<strong>' + tipnijinak_ajax.error_text + ':</strong> ' + tipnijinak_ajax.server_error).show();
+                }
             }
         });
     });

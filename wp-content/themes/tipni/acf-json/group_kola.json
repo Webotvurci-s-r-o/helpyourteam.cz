@@ -139,6 +139,93 @@
             "min": "",
             "max": "",
             "elements": ""
+        },
+        {
+            "key": "field_ceny_kola",
+            "label": "Ceny kola",
+            "name": "ceny_kola",
+            "aria-label": "",
+            "type": "repeater",
+            "instructions": "Ceny pro toto kolo. Pokud nevyplníte, použijí se ceny ze soutěže.",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "collapsed": "",
+            "min": 0,
+            "max": 0,
+            "layout": "block",
+            "button_label": "Přidat cenu",
+            "sub_fields": [
+                {
+                    "key": "field_cena_kola_nazev",
+                    "label": "Název ceny",
+                    "name": "nazev",
+                    "aria-label": "",
+                    "type": "text",
+                    "instructions": "",
+                    "required": 1,
+                    "conditional_logic": 0,
+                    "wrapper": {
+                        "width": "33",
+                        "class": "",
+                        "id": ""
+                    },
+                    "default_value": "",
+                    "placeholder": "1. místo",
+                    "prepend": "",
+                    "append": "",
+                    "maxlength": ""
+                },
+                {
+                    "key": "field_cena_kola_popis",
+                    "label": "Popis ceny",
+                    "name": "popis",
+                    "aria-label": "",
+                    "type": "textarea",
+                    "instructions": "",
+                    "required": 0,
+                    "conditional_logic": 0,
+                    "wrapper": {
+                        "width": "33",
+                        "class": "",
+                        "id": ""
+                    },
+                    "default_value": "",
+                    "placeholder": "Popis ceny...",
+                    "maxlength": "",
+                    "rows": 3,
+                    "new_lines": "br"
+                },
+                {
+                    "key": "field_cena_kola_obrazek",
+                    "label": "Obrázek ceny",
+                    "name": "obrazek",
+                    "aria-label": "",
+                    "type": "image",
+                    "instructions": "",
+                    "required": 0,
+                    "conditional_logic": 0,
+                    "wrapper": {
+                        "width": "33",
+                        "class": "",
+                        "id": ""
+                    },
+                    "return_format": "array",
+                    "preview_size": "thumbnail",
+                    "library": "all",
+                    "min_width": "",
+                    "min_height": "",
+                    "min_size": "",
+                    "max_width": "",
+                    "max_height": "",
+                    "max_size": "",
+                    "mime_types": "jpg,jpeg,png,svg,svgz"
+                }
+            ]
         }
     ],
     "location": [

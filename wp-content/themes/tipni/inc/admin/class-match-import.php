@@ -997,7 +997,14 @@ class Tipnijinak_Match_Import {
             update_post_meta( $match_id, 'skore_domaci', $data['vysledek_1'] );
             update_post_meta( $match_id, 'skore_hoste', $data['vysledek_2'] );
         }
-        
+
+        // Automaticky vyhodnotit tipy pokud je zápas ukončený a má skóre
+        if ( $data['status'] === 'ukonceny' && $data['vysledek_1'] >= 0 && $data['vysledek_2'] >= 0 ) {
+            if ( function_exists( 'tipnijinak_evaluate_match' ) ) {
+                tipnijinak_evaluate_match( $match_id );
+            }
+        }
+
         // Set odds properly for ACF
         if ( function_exists( 'update_field' ) ) {
             // Add ACF kurzy fields as group
@@ -1112,7 +1119,14 @@ class Tipnijinak_Match_Import {
             update_post_meta( $match_id, 'skore_domaci', $data['vysledek_1'] );
             update_post_meta( $match_id, 'skore_hoste', $data['vysledek_2'] );
         }
-        
+
+        // Automaticky vyhodnotit tipy pokud je zápas ukončený a má skóre
+        if ( $data['status'] === 'ukonceny' && $data['vysledek_1'] >= 0 && $data['vysledek_2'] >= 0 ) {
+            if ( function_exists( 'tipnijinak_evaluate_match' ) ) {
+                tipnijinak_evaluate_match( $match_id );
+            }
+        }
+
         // Set odds properly for ACF
         if ( function_exists( 'update_field' ) ) {
             // Add ACF kurzy fields as group
@@ -1128,7 +1142,7 @@ class Tipnijinak_Match_Import {
             update_post_meta( $match_id, 'kurz_0', $data['kurz_0'] );
             update_post_meta( $match_id, 'kurz_2', $data['kurz_2'] );
         }
-        
+
         // Assign liga taxonomy
         $this->assign_liga_taxonomy($match_id, $data['liga']);
         

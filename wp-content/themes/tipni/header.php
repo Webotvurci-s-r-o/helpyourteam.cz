@@ -55,6 +55,23 @@ if ( ! defined( 'ABSPATH' ) ) {
                     </a>
                 </div>
             <?php endif; ?>
+            <?php if ( is_user_logged_in() ) :
+                $current_user = wp_get_current_user();
+            ?>
+                <div class="header-user">
+                    <a href="<?php echo esc_url( home_url( '/profil/' ) ); ?>" class="user-name">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M20 21V19C20 17.9391 19.5786 16.9217 18.8284 16.1716C18.0783 15.4214 17.0609 15 16 15H8C6.93913 15 5.92172 15.4214 5.17157 16.1716C4.42143 16.9217 4 17.9391 4 19V21M16 7C16 9.20914 14.2091 11 12 11C9.79086 11 8 9.20914 8 7C8 4.79086 9.79086 3 12 3C14.2091 3 16 4.79086 16 7Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                        <?php echo esc_html( $current_user->user_login ); ?>
+                    </a>
+                    <a href="<?php echo esc_url( wp_logout_url( home_url() ) ); ?>" class="logout-link" title="<?php esc_attr_e( 'Odhlásit se', 'tipnijinak' ); ?>">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M9 21H5C4.46957 21 3.96086 20.7893 3.58579 20.4142C3.21071 20.0391 3 19.5304 3 19V5C3 4.46957 3.21071 3.96086 3.58579 3.58579C3.96086 3.21071 4.46957 3 5 3H9M16 17L21 12M21 12L16 7M21 12H9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </a>
+                </div>
+            <?php endif; ?>
         </div>
         <div class="menu-navigation">
             <span>menu</span>

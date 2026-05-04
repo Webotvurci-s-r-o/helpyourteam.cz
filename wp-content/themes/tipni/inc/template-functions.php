@@ -11,20 +11,36 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 /**
  * Prepare competition data for single-soutez.php template
- * 
+ *
  * @param int $competition_id Competition ID (optional, defaults to current post)
  * @return array Competition data for template parts
  */
 function tipnijinak_prepare_competition_data($competition_id = null) {
     if (!$competition_id) {
-        $competition_id = get_the_ID();
+        // Použít get_queried_object_id() pro single post templates - spolehlivější než get_the_ID()
+        // protože není ovlivněno query vars jako 'kolo' (který je registrovaný jako CPT)
+        $queried_object = get_queried_object();
+
+        if ($queried_object && isset($queried_object->ID) && $queried_object->post_type === 'soutez') {
+            $competition_id = $queried_object->ID;
+        } else {
+            // Fallback na get_the_ID()
+            $competition_id = get_the_ID();
+        }
     }
-    
-    // DEBUG: Check if functions exist
-    if (current_user_can('administrator')) {
-        error_log('DEBUG: tipnijinak_prepare_competition_data called with ID: ' . $competition_id);
-        error_log('DEBUG: tipnijinak_get_competition_rounds exists: ' . (function_exists('tipnijinak_get_competition_rounds') ? 'YES' : 'NO'));
-        error_log('DEBUG: tipnijinak_get_active_competition_round exists: ' . (function_exists('tipnijinak_get_active_competition_round') ? 'YES' : 'NO'));
+
+    // DEBUG: Zobrazit debug info pro administrátory při problémech - DOČASNĚ VYPNUTO
+    if (false && get_current_user_id() === 1 && isset($_GET['debug'])) {
+        $queried_obj = get_queried_object();
+        echo '<div style="background: #333; color: #fff; padding: 15px; margin: 20px; border-radius: 5px; position: fixed; top: 10px; right: 10px; z-index: 99999; max-width: 400px; font-size: 12px;">';
+        echo '<strong>DEBUG - Competition Data Loading:</strong><br>';
+        echo 'Competition ID: ' . $competition_id . '<br>';
+        echo 'Queried object type: ' . (isset($queried_obj->post_type) ? $queried_obj->post_type : 'N/A') . '<br>';
+        echo 'Queried object ID: ' . (isset($queried_obj->ID) ? $queried_obj->ID : 'N/A') . '<br>';
+        echo 'get_the_ID(): ' . get_the_ID() . '<br>';
+        echo '$_GET[kolo]: ' . (isset($_GET['kolo']) ? $_GET['kolo'] : 'not set') . '<br>';
+        echo '$_GET[tab]: ' . (isset($_GET['tab']) ? $_GET['tab'] : 'not set') . '<br>';
+        echo '</div>';
     }
     
     // Basic competition info
@@ -60,23 +76,29 @@ function tipnijinak_prepare_competition_data($competition_id = null) {
     $has_access = true; // TODO: Implement access check function later
     $product_id = get_field('woocommerce_produkt', $competition_id);
     
+    // Main competition sums points across all rounds, team competition is per round
+    $is_main_competition = get_field('je_hlavni', $competition_id);
+    $current_round_id = $current_round ? $current_round['id'] : 0;
+    $ranking_round_id = $is_main_competition ? 0 : $current_round_id;
+
     // User data
-    $user_points = is_user_logged_in() ? tipnijinak_get_user_total_points($competition_id) : 0;
-    $user_tips_count = 0; // TODO: Implement tipnijinak_get_user_tips_count function
-    $user_ranking = is_user_logged_in() ? tipnijinak_get_user_ranking($competition_id) : 0;
-    
+    $user_points = is_user_logged_in() ? tipnijinak_get_user_total_points($competition_id, 0, $ranking_round_id) : 0;
+    $user_tips_count = is_user_logged_in() ? tipnijinak_get_user_tips_count($competition_id, 0, $ranking_round_id) : 0;
+    $user_ranking = is_user_logged_in() ? tipnijinak_get_user_ranking($competition_id, 0, $ranking_round_id) : 0;
+
     // Leaderboard
-    $leaderboard = tipnijinak_get_competition_leaderboard($competition_id, 10);
-    
+    $leaderboard = tipnijinak_get_competition_leaderboard($competition_id, 10, 0, $ranking_round_id);
+
     // Active tab
     $active_tab = isset($_GET['tab']) ? $_GET['tab'] : 'competitions';
-    
+
     return array(
         'competition_id' => $competition_id,
         'category' => $category,
         'rounds' => $rounds,
         'active_round' => $active_round,
         'current_round' => $current_round,
+        'is_main_competition' => $is_main_competition,
         'body_text' => $body_text,
         'has_access' => $has_access,
         'product_id' => $product_id,
@@ -174,15 +196,22 @@ function tipnijinak_format_match_time($date_time) {
  */
 function tipnijinak_get_match_score($match_id) {
     if (!$match_id) {
-        return '0 : 0';
+        return '- : -';
     }
-    
+
+    $stav = get_field('stav_zapasu', $match_id);
+
+    // Skóre zobrazit pouze u ukončených zápasů
+    if ($stav !== 'ukonceny') {
+        return '- : -';
+    }
+
     $domaci_skore = get_field('skore_domaci', $match_id);
     $hoste_skore = get_field('skore_hoste', $match_id);
-    
+
     $domaci_skore = $domaci_skore !== '' ? $domaci_skore : '0';
     $hoste_skore = $hoste_skore !== '' ? $hoste_skore : '0';
-    
+
     return $domaci_skore . ' : ' . $hoste_skore;
 }
 
@@ -445,6 +474,9 @@ function tipnijinak_get_round_details($round_id) {
     $matches = array();
     if (is_array($zapasy_kola) && !empty($zapasy_kola)) {
         foreach ($zapasy_kola as $match_id) {
+            if (get_post_status($match_id) !== 'publish') {
+                continue;
+            }
             $matches[] = tipnijinak_get_match_details($match_id);
         }
     }
@@ -483,6 +515,9 @@ function tipnijinak_get_competition_rounds($competition_id) {
     $rounds = array();
     
     foreach ($round_ids as $round_id) {
+        if (get_post_status($round_id) !== 'publish') {
+            continue;
+        }
         $rounds[] = tipnijinak_get_round_details($round_id);
     }
     

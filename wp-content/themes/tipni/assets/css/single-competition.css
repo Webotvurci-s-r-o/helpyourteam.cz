@@ -947,6 +947,23 @@
     margin-bottom: 15px;
 }
 
+/* Toggle button - hidden on desktop */
+.toggle-recap-tips {
+    display: none;
+}
+
+/* Mobile recap overlay */
+.recap-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.6);
+    z-index: 998;
+}
+
 @media (max-width: 991px) {
     .two-columns {
         flex-direction: column;
@@ -972,8 +989,12 @@
     }
 
     .window-switcher li {
-        padding: 10px 15px;
+        padding: 1px 8px;
         font-size: 14px;
+    }
+
+    .competitions .main-competition {
+        padding: 20px;
     }
 
     .match {
@@ -1004,5 +1025,76 @@
         text-align: center;
         margin-left: 0;
         margin-top: 5px;
+    }
+
+    /* Fixed bottom recap bar */
+    .two-columns__column.right.recap {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        z-index: 999;
+        max-width: 100%;
+        border-radius: 16px 16px 0 0;
+        padding: 12px 16px;
+        margin: 0;
+        border: 1px solid #21222D;
+        box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.4);
+    }
+
+    /* Hide matches list by default on mobile */
+    .two-columns__column.right.recap .matches-recap {
+        display: none;
+        max-height: 50vh;
+        overflow-y: auto;
+        margin-bottom: 12px;
+    }
+
+    /* Show matches list when expanded */
+    .two-columns__column.right.recap.expanded .matches-recap {
+        display: flex;
+    }
+
+    /* Bottom bar layout */
+    .recap-bottom {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .recap-bottom .matches-left {
+        margin-bottom: 0;
+        flex: 1;
+        font-size: 13px;
+    }
+
+    .recap-bottom .toggle-recap-tips {
+        display: inline-flex;
+        font-size: 13px;
+        padding: 6px 12px;
+        color: #000;
+    }
+
+    .recap-bottom .btn-holder {
+        width: 100%;
+    }
+
+    .recap-bottom .btn-holder .submit-tips {
+        width: 100%;
+    }
+
+    .recap-bottom .tips-feedback {
+        width: 100%;
+    }
+
+    /* Add padding to page content so it's not hidden behind fixed bar */
+    .guessing .two-columns__column.left {
+        padding-bottom: 140px;
+    }
+
+    /* Overlay visible when expanded */
+    .recap-overlay.active {
+        display: block;
     }
 }

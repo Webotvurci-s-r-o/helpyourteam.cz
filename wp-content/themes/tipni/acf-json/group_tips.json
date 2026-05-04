@@ -6,6 +6,7 @@
             "key": "field_tip_user",
             "label": "Uživatel",
             "name": "tip_user",
+            "aria-label": "",
             "type": "user",
             "instructions": "Uživatel, který vytvořil tip",
             "required": 1,
@@ -24,6 +25,7 @@
             "key": "field_tip_match",
             "label": "Zápas",
             "name": "tip_match",
+            "aria-label": "",
             "type": "post_object",
             "instructions": "Zápas, pro který je tip vytvořen",
             "required": 1,
@@ -46,6 +48,7 @@
             "key": "field_tip_competition",
             "label": "Soutěž",
             "name": "tip_competition",
+            "aria-label": "",
             "type": "post_object",
             "instructions": "Soutěž, ke které tip patří",
             "required": 1,
@@ -68,6 +71,7 @@
             "key": "field_tip_round",
             "label": "Kolo",
             "name": "tip_round",
+            "aria-label": "",
             "type": "post_object",
             "instructions": "Kolo, ke kterému tip patří",
             "required": 1,
@@ -90,6 +94,7 @@
             "key": "field_tip_value",
             "label": "Hodnota tipu",
             "name": "tip_value",
+            "aria-label": "",
             "type": "select",
             "instructions": "Tip uživatele na výsledek zápasu",
             "required": 1,
@@ -104,7 +109,7 @@
                 "0": "Remíza (0)",
                 "2": "Výhra hostů (2)"
             },
-            "default_value": "",
+            "default_value": false,
             "allow_null": 0,
             "multiple": 0,
             "ui": 0,
@@ -116,6 +121,7 @@
             "key": "field_tip_points",
             "label": "Získané body",
             "name": "tip_points",
+            "aria-label": "",
             "type": "number",
             "instructions": "Počet bodů získaných za tento tip",
             "required": 0,
@@ -126,17 +132,18 @@
                 "id": ""
             },
             "default_value": 0,
-            "placeholder": "",
-            "prepend": "",
-            "append": "bodů",
-            "min": 0,
+            "min": "",
             "max": "",
-            "step": ""
+            "placeholder": "",
+            "step": "",
+            "prepend": "",
+            "append": "bodů"
         },
         {
             "key": "field_tip_evaluated",
             "label": "Vyhodnoceno",
             "name": "tip_evaluated",
+            "aria-label": "",
             "type": "true_false",
             "instructions": "Byl tip již vyhodnocen?",
             "required": 0,
@@ -170,5 +177,6 @@
     "hide_on_screen": "",
     "active": true,
     "description": "",
-    "modified": 1711023000
+    "show_in_rest": 0,
+    "modified": 1763585840
 }

@@ -30,9 +30,9 @@ $rounds = $args['rounds'] ?? array();
     
     <!-- Celkový souhrn -->
     <div class="guessing-summary">
-        <div class="guessing-summary__points"><?php printf(__('Celkový počet bodů: %d', 'tipnijinak'), $user_points); ?></div>
-        <div class="guessing-summary__tips"><?php printf(__('Celkem tipnutých zápasů: %d', 'tipnijinak'), $user_tips_count); ?></div>
-        <div class="guessing-summary__ranking"><?php printf(__('Umístění v žebříčku: %d', 'tipnijinak'), $user_ranking); ?></div>
+        <div class="guessing-summary__points"><?php printf(__('Body v aktuálním kole: %d', 'tipnijinak'), $user_points); ?></div>
+        <div class="guessing-summary__tips"><?php printf(__('Tipnutých zápasů v kole: %d', 'tipnijinak'), $user_tips_count); ?></div>
+        <div class="guessing-summary__ranking"><?php printf(__('Umístění v kole: %d', 'tipnijinak'), $user_ranking); ?></div>
     </div>
     
     <?php 
@@ -44,49 +44,14 @@ $rounds = $args['rounds'] ?? array();
     $total_earned_points = 0;
     $total_correct_tips = 0;
     $total_tips_count = 0;
+    $total_evaluated_count = 0;
     
     // Projít všechna kola a získat tipy
     foreach ($rounds as $round) {
-        // Prioritně použít Custom Post Type funkci
-        $round_tips = function_exists('tipnijinak_get_user_round_tips_alt') ? 
-            tipnijinak_get_user_round_tips_alt($round['id'], $current_user_id) : 
-            tipnijinak_get_user_round_tips($round['id']);
-        
-        // Pokud stále nemáme data, zkusit získat tipy přímo z databáze
-        if (empty($round_tips)) {
-            global $wpdb;
-            
-            // Nejprve zkusit s round_id
-            $round_tips = $wpdb->get_results($wpdb->prepare(
-                "SELECT match_id, tip, kurz as odds FROM {$wpdb->prefix}tipnijinak_tips 
-                 WHERE user_id = %d AND round_id = %d",
-                $current_user_id,
-                $round['id']
-            ), ARRAY_A);
-            
-            // Pokud neúspěch, zkusit podle zápasů v kole (bez round_id)
-            if (empty($round_tips) && !empty($round['matches'])) {
-                $match_ids = array_column($round['matches'], 'id');
-                if (!empty($match_ids)) {
-                    $placeholders = implode(',', array_fill(0, count($match_ids), '%d'));
-                    $query = $wpdb->prepare(
-                        "SELECT match_id, tip, kurz as odds FROM {$wpdb->prefix}tipnijinak_tips 
-                         WHERE user_id = %d AND match_id IN ($placeholders)",
-                        array_merge([$current_user_id], $match_ids)
-                    );
-                    $round_tips = $wpdb->get_results($query, ARRAY_A);
-                }
-            }
-            
-            // Převést na očekávaný formát
-            if (!empty($round_tips)) {
-                foreach ($round_tips as &$tip) {
-                    $tip['match_id'] = (int)$tip['match_id'];
-                    $tip['tip'] = $tip['tip'];
-                    $tip['odds'] = floatval($tip['odds']);
-                }
-            }
-        }
+        // Použít Custom Post Type funkci pro načtení tipů
+        $round_tips = function_exists('tipnijinak_get_user_round_tips_alt') ?
+            tipnijinak_get_user_round_tips_alt($round['id'], $current_user_id) :
+            tipnijinak_get_user_round_tips($round['id'], $current_user_id);
         
         if (!empty($round_tips)) {
             $round_data = array(
@@ -100,7 +65,7 @@ $rounds = $args['rounds'] ?? array();
             foreach ($round_tips as $tip) {
                 $match = tipnijinak_get_match_details($tip['match_id']);
                 if (!$match) continue;
-                
+
                 $tip_data = array(
                     'match' => $match,
                     'user_tip' => $tip['tip'],
@@ -108,57 +73,31 @@ $rounds = $args['rounds'] ?? array();
                     'points' => 0,
                     'is_correct' => null
                 );
-                
-                // Pokud je zápas dokončený, vyhodnotit tip
-                if ($match['status'] === 'ukonceny') {
-                    $scores = explode(' : ', $match['score']);
-                    if (count($scores) == 2 && is_numeric(trim($scores[0])) && is_numeric(trim($scores[1]))) {
-                        $home_score = intval(trim($scores[0]));
-                        $away_score = intval(trim($scores[1]));
-                        
-                        $match_result = null;
-                        if ($home_score > $away_score) {
-                            $match_result = '1';
-                        } elseif ($home_score < $away_score) {
-                            $match_result = '2';
-                        } else {
-                            $match_result = '0';
-                        }
-                        
-                        $tip_data['is_correct'] = ($tip['tip'] === $match_result);
 
-                        // Získat body za tip (vždy vypočítat, i pro špatné tipy)
-                        $calculated_points = 0;
-                        if ($tip_data['odds'] > 0) {
-                            $calculated_points = tipnijinak_get_points_by_odds($tip_data['odds']);
-                        } else {
-                            // Zkusit získat kurz ze zápasu
-                            $kurzy = get_field('kurzy', $match['id']);
-                            if ($tip['tip'] === '1' && !empty($kurzy['kurz_domaci'])) {
-                                $calculated_points = tipnijinak_get_points_by_odds(floatval($kurzy['kurz_domaci']));
-                            } elseif ($tip['tip'] === '0' && !empty($kurzy['kurz_remiza'])) {
-                                $calculated_points = tipnijinak_get_points_by_odds(floatval($kurzy['kurz_remiza']));
-                            } elseif ($tip['tip'] === '2' && !empty($kurzy['kurz_hoste'])) {
-                                $calculated_points = tipnijinak_get_points_by_odds(floatval($kurzy['kurz_hoste']));
-                            }
-                        }
+                // Pokud je tip již vyhodnocený v CPT, použít uložené body
+                if (!empty($tip['evaluated']) && isset($tip['points'])) {
+                    $stored_points = intval($tip['points']);
 
-                        if ($tip_data['is_correct']) {
-                            // Správný tip - přidat kladné body
-                            $tip_data['points'] = $calculated_points;
-                            $round_data['points'] += $tip_data['points'];
-                            $round_data['correct']++;
-                            $total_earned_points += $tip_data['points'];
-                            $total_correct_tips++;
-                        } else {
-                            // Špatný tip - odečíst body
-                            $tip_data['points'] = $calculated_points; // Uložíme kladnou hodnotu pro zobrazení
-                            $round_data['points'] -= $calculated_points; // Odečíst od celkových bodů kola
-                            $total_earned_points -= $calculated_points; // Odečíst od celkových bodů
-                        }
+                    // Určit, jestli byl tip správný nebo špatný podle bodů
+                    if ($stored_points > 0) {
+                        $tip_data['is_correct'] = true;
+                        $tip_data['points'] = $stored_points;
+                        $round_data['points'] += $stored_points;
+                        $round_data['correct']++;
+                        $total_earned_points += $stored_points;
+                        $total_correct_tips++;
+                        $total_evaluated_count++;
+                    } elseif ($stored_points < 0) {
+                        $tip_data['is_correct'] = false;
+                        $tip_data['points'] = abs($stored_points); // Pro zobrazení používáme absolutní hodnotu
+                        $round_data['points'] += $stored_points; // Přičíst zápornou hodnotu (= odečíst)
+                        $total_earned_points += $stored_points;
+                        $total_evaluated_count++;
                     }
                 }
-                
+                // Zápas ukončený ale nevyhodnocený - necháme is_correct = null,
+                // zobrazí se jako "Čeká na vyhodnocení"
+
                 $round_data['tips'][] = $tip_data;
                 $total_tips_count++;
             }
@@ -171,11 +110,74 @@ $rounds = $args['rounds'] ?? array();
     usort($user_all_tips, function($a, $b) {
         return $b['round_info']['id'] - $a['round_info']['id'];
     });
+
+    // Debug: Porovnat hodnoty z funkce vs. počítané v šabloně - DOČASNĚ VYPNUTO
+    if (false && get_current_user_id() === 1) {
+        $difference = $user_points - $total_earned_points;
+        if ($difference != 0) {
+            echo '<div style="background: #ff6b6b; color: #fff; padding: 15px; margin: 20px 0; border-radius: 5px;">';
+            echo '<strong>⚠️ DEBUG: Nesrovnalost v bodech (pouze pro administrátory)</strong><br>';
+            echo 'Celkový souhrn (funkce): ' . $user_points . ' bodů<br>';
+            echo 'Statistiky tipování (šablona): ' . $total_earned_points . ' bodů<br>';
+            echo 'Rozdíl: ' . $difference . ' bodů<br><br>';
+
+            // Najít všechny vyhodnocené tipy pro tuto soutěž
+            $all_evaluated_tips = new WP_Query(array(
+                'post_type' => 'user_tip',
+                'posts_per_page' => -1,
+                'meta_query' => array(
+                    'relation' => 'AND',
+                    array('key' => 'tip_user', 'value' => $current_user_id),
+                    array('key' => 'tip_competition', 'value' => $competition_id),
+                    array('key' => 'tip_evaluated', 'value' => '1'),
+                )
+            ));
+
+            echo 'Celkem vyhodnocených tipů v CPT: ' . $all_evaluated_tips->found_posts . '<br>';
+            echo 'Celkem tipů zobrazených v šabloně: ' . $total_tips_count . '<br>';
+
+            if ($all_evaluated_tips->have_posts()) {
+                echo '<br><strong>Seznam všech vyhodnocených tipů v CPT:</strong><br>';
+                while ($all_evaluated_tips->have_posts()) {
+                    $all_evaluated_tips->the_post();
+                    $tip_id = get_the_ID();
+
+                    // Zkusit ACF i raw meta
+                    $match_id = get_field('tip_match', $tip_id) ?: get_post_meta($tip_id, 'tip_match', true);
+                    $round_id = get_field('tip_round', $tip_id) ?: get_post_meta($tip_id, 'tip_round', true);
+                    $points = get_field('tip_points', $tip_id);
+                    if ($points === false || $points === null) {
+                        $points = get_post_meta($tip_id, 'tip_points', true);
+                    }
+                    $tip_value = get_field('tip_value', $tip_id) ?: get_post_meta($tip_id, 'tip_value', true);
+
+                    // Debug raw meta
+                    $all_meta = get_post_meta($tip_id);
+
+                    echo sprintf('- Tip ID: %d, Match: %s, Round: %s, Tip: %s, Body: %s<br>',
+                        $tip_id,
+                        $match_id ?: 'N/A',
+                        $round_id ?: 'N/A',
+                        $tip_value ?: 'N/A',
+                        $points !== false && $points !== null && $points !== '' ? $points : 'N/A'
+                    );
+
+                    // Ukázat RAW meta pro první tip
+                    if ($tip_id == $all_evaluated_tips->posts[0]->ID) {
+                        echo '<small style="opacity: 0.8;">RAW meta první tip: ' . print_r(array_map(function($v) { return $v[0]; }, $all_meta), true) . '</small><br>';
+                    }
+                }
+                wp_reset_postdata();
+            }
+
+            echo '</div>';
+        }
+    }
     ?>
     
     <?php 
-    // Debug informace - zobrazit pouze pokud jsou tipy prázdné
-    if (empty($user_all_tips) && current_user_can('administrator')) {
+    // Debug informace - zobrazit pouze pokud jsou tipy prázdné - DOČASNĚ VYPNUTO
+    if (false && empty($user_all_tips) && get_current_user_id() === 1) {
         echo '<div style="background: #333; color: #fff; padding: 15px; margin: 20px 0; border-radius: 5px;">';
         echo '<strong>Debug informace (pouze pro administrátory):</strong><br>';
         echo 'User ID: ' . $current_user_id . '<br>';
@@ -215,11 +217,11 @@ $rounds = $args['rounds'] ?? array();
             </div>
             <div class="stat-item">
                 <span class="stat-label"><?php esc_html_e('Správné tipy:', 'tipnijinak'); ?></span>
-                <span class="stat-value"><?php echo esc_html($total_correct_tips); ?> / <?php echo esc_html($total_tips_count); ?></span>
+                <span class="stat-value"><?php echo esc_html($total_correct_tips); ?> / <?php echo esc_html($total_evaluated_count); ?></span>
             </div>
             <div class="stat-item">
                 <span class="stat-label"><?php esc_html_e('Úspěšnost:', 'tipnijinak'); ?></span>
-                <span class="stat-value"><?php echo $total_tips_count > 0 ? round(($total_correct_tips / $total_tips_count) * 100, 1) : 0; ?>%</span>
+                <span class="stat-value"><?php echo $total_evaluated_count > 0 ? round(($total_correct_tips / $total_evaluated_count) * 100, 1) : 0; ?>%</span>
             </div>
         </div>
     </div>

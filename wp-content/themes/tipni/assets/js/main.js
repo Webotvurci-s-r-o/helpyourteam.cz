@@ -13,6 +13,14 @@ jQuery(document).ready(function () {
         jQuery("." + jQuery(this).attr("data")).addClass("active");
     })
 
+    // Mobile submenu toggle
+    jQuery(".navigation .menu-item-has-children > a").on("click", function (e) {
+        if (jQuery(window).width() < 992) {
+            e.preventDefault();
+            jQuery(this).parent().toggleClass("submenu-open");
+        }
+    });
+
     if (jQuery(window).width() < 992) {
         jQuery("body").addClass("mobile");
         jQuery(".navigation-wrapper").appendTo(".overall-wrapper");

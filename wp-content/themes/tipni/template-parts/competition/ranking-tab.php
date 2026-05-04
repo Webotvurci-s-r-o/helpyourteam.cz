@@ -10,10 +10,62 @@ if (!defined('ABSPATH')) {
 }
 
 $leaderboard = $args['leaderboard'] ?? array();
+$rounds = $args['rounds'] ?? array();
+$current_round = $args['current_round'] ?? null;
+$competition_id = $args['competition_id'] ?? get_the_ID();
+$is_main_competition = $args['is_main_competition'] ?? false;
 ?>
 
 <!-- TAB 4: Guessing-Ranking/Žebříček -->
 <div class="guessing-ranking <?php echo $args['active_tab'] === 'guessing-ranking' ? 'active' : ''; ?>">
+
+    <?php if (!empty($rounds) && $current_round && !$is_main_competition) : ?>
+    <!-- Navigace mezi koly -->
+    <div class="round">
+        <h3><?php echo esc_html($current_round['cislo_kola'] . '. kolo'); ?></h3>
+        <div class="round-info">
+            <span class="duration"><?php printf(__('Doba trvání: %s - %s', 'tipnijinak'),
+                esc_html($current_round['datum_od_format']),
+                esc_html($current_round['datum_do_format'])); ?></span>
+            <span class="status"><?php printf(__('Stav: %s', 'tipnijinak'),
+                esc_html($current_round['stav_kola_text'])); ?></span>
+        </div>
+        <div class="pagination big">
+            <?php
+            $prev_round = null;
+            $next_round = null;
+
+            foreach ($rounds as $i => $round) {
+                if ($round['id'] == $current_round['id']) {
+                    if ($i > 0) {
+                        $prev_round = $rounds[$i - 1];
+                    }
+                    if ($i < count($rounds) - 1) {
+                        $next_round = $rounds[$i + 1];
+                    }
+                    break;
+                }
+            }
+            ?>
+            <?php if ($prev_round) : ?>
+            <div class="pagination-prev">
+                <a href="<?php echo esc_url(add_query_arg(['tab' => 'guessing-ranking', 'kolo' => $prev_round['id']], get_permalink())); ?>"></a>
+            </div>
+            <?php else : ?>
+            <div class="pagination-prev disabled"></div>
+            <?php endif; ?>
+
+            <?php if ($next_round) : ?>
+            <div class="pagination-next">
+                <a href="<?php echo esc_url(add_query_arg(['tab' => 'guessing-ranking', 'kolo' => $next_round['id']], get_permalink())); ?>"></a>
+            </div>
+            <?php else : ?>
+            <div class="pagination-next disabled"></div>
+            <?php endif; ?>
+        </div>
+    </div>
+    <?php endif; ?>
+
     <?php if (!empty($leaderboard)) : ?>
     <table>
         <thead>
@@ -26,12 +78,21 @@ $leaderboard = $args['leaderboard'] ?? array();
         </tr>
         </thead>
         <tbody>
-        <?php 
-        // Získat ceny pro žebříček
-        $prizes_group = get_field('ceny_souteze');
-        $prizes = (!empty($prizes_group) && !empty($prizes_group['ceny'])) ? $prizes_group['ceny'] : array();
-        
-        foreach ($leaderboard as $position => $user_data) : 
+        <?php
+        // Získat ceny pro žebříček - nejdříve z kola, pak fallback na soutěž
+        $prizes = array();
+        if ($current_round) {
+            $round_prizes = get_field('ceny_kola', $current_round['id']);
+            if (!empty($round_prizes)) {
+                $prizes = $round_prizes;
+            }
+        }
+        if (empty($prizes)) {
+            $prizes_group = get_field('ceny_souteze', $competition_id);
+            $prizes = (!empty($prizes_group) && !empty($prizes_group['ceny'])) ? $prizes_group['ceny'] : array();
+        }
+
+        foreach ($leaderboard as $position => $user_data) :
             $trophy = '';
             if ($position === 0) {
                 $trophy = '<img src="' . esc_url(get_template_directory_uri() . '/assets/images/trophy-gold.svg') . '" alt="" width="23">';
@@ -40,19 +101,19 @@ $leaderboard = $args['leaderboard'] ?? array();
             } elseif ($position === 2) {
                 $trophy = '<img src="' . esc_url(get_template_directory_uri() . '/assets/images/trophy-bronze.svg') . '" alt="" width="23">';
             }
-            
+
             // Získat logo oblíbeného klubu
             $club_logo_url = '';
             $club_id = get_user_meta($user_data['user_id'], 'club_id', true);
-     
+
             if (!empty($club_id)) {
                 $logo_id = get_field('logo_tymu', $club_id);
-         
+
                 if (!empty($logo_id) && is_numeric($logo_id)) {
                     $club_logo_url = wp_get_attachment_url($logo_id);
                 }
             }
-            
+
             // Získat cenu pro tuto pozici
             $prize_for_position = isset($prizes[$position]) ? $prizes[$position] : null;
         ?>
@@ -82,16 +143,11 @@ $leaderboard = $args['leaderboard'] ?? array();
         <?php endforeach; ?>
         </tbody>
     </table>
-    
-    <?php if (count($leaderboard) > 10) : ?>
-    <div class="pagination big">
-        <div class="pagination-prev"></div>
-        <div class="pagination-next"></div>
-    </div>
-    <?php endif; ?>
     <?php else : ?>
     <div class="no-leaderboard-data">
-        <p><?php esc_html_e('Zatím nejsou k dispozici žádné údaje pro žebříček.', 'tipnijinak'); ?></p>
+        <p><?php echo $is_main_competition
+            ? esc_html__('Zatím nejsou k dispozici žádné údaje pro žebříček.', 'tipnijinak')
+            : esc_html__('Zatím nejsou k dispozici žádné údaje pro žebříček v tomto kole.', 'tipnijinak'); ?></p>
     </div>
     <?php endif; ?>
 </div>

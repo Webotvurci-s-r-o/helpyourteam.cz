@@ -1,0 +1,290 @@
+/**
+ * Checkout custom fields styles - Tipni Jinak
+ */
+
+/* Custom fields section */
+.tipnijinak-checkout-fields {
+    background: linear-gradient(180deg, #24242F 0%, #15131D 100%);
+    border-radius: 8px;
+    border: 1px solid #21222D;
+    padding: 25px;
+    margin-top: 30px;
+    margin-bottom: 30px;
+}
+
+.tipnijinak-checkout-fields h3 {
+    margin-top: 0;
+    margin-bottom: 20px;
+    font-size: var(--size-h3);
+    color: #fff;
+}
+
+/* Club search field */
+.tipnijinak-club-field {
+    margin-bottom: 20px;
+}
+
+.tipnijinak-club-field > label {
+    display: block;
+    margin-bottom: 10px;
+    font-weight: 500;
+}
+
+.tipnijinak-club-field .club-search-container {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.tipnijinak-club-field #tipnijinak_club_search {
+    flex: 1;
+    min-height: 42px;
+    border-radius: 10px;
+    border: none;
+    padding: 5px 15px;
+    background-color: #fff;
+    color: #1a1a1a;
+}
+
+.tipnijinak-club-field #tipnijinak-add-new-club {
+    white-space: nowrap;
+    padding: 10px 15px;
+    font-size: 14px;
+}
+
+/* Club search results */
+.club-results-container {
+    margin-top: 10px;
+}
+
+.club-results {
+    background: #1a1a24;
+    border-radius: 8px;
+    border: 1px solid #21222D;
+    max-height: 200px;
+    overflow-y: auto;
+}
+
+.club-item {
+    padding: 12px 15px;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    border-bottom: 1px solid #21222D;
+}
+
+.club-item:last-child {
+    border-bottom: none;
+}
+
+.club-item:hover {
+    background-color: #2a2a3a;
+}
+
+.club-results .no-results {
+    padding: 12px 15px;
+    color: #A6A9B8;
+    text-align: center;
+}
+
+/* Checkboxes */
+.tipnijinak-checkbox {
+    margin-top: 15px;
+}
+
+.tipnijinak-checkbox label {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    cursor: pointer;
+    line-height: 1.5;
+}
+
+.tipnijinak-checkbox input[type="checkbox"] {
+    min-height: unset;
+    width: 18px;
+    height: 18px;
+    margin-top: 3px;
+    flex-shrink: 0;
+}
+
+.tipnijinak-checkbox a {
+    color: var(--color-primary);
+    text-decoration: underline;
+}
+
+.tipnijinak-checkbox a:hover {
+    text-decoration: none;
+}
+
+/* Required field indicator */
+.tipnijinak-checkbox .required {
+    color: var(--color-primary);
+}
+
+/* Modal styles */
+.tipnijinak-modal {
+    display: none;
+    position: fixed;
+    z-index: 10000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0, 0, 0, 0.7);
+}
+
+.tipnijinak-modal-content {
+    position: relative;
+    background: linear-gradient(180deg, #24242F 0%, #15131D 100%);
+    margin: 10% auto;
+    padding: 30px;
+    border-radius: 8px;
+    border: 1px solid #21222D;
+    max-width: 500px;
+    width: 90%;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+    animation: tipnijinakModalSlideIn 0.3s ease;
+}
+
+@keyframes tipnijinakModalSlideIn {
+    from {
+        transform: translateY(-50px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+.tipnijinak-close-modal {
+    position: absolute;
+    top: 10px;
+    right: 15px;
+    color: #A6A9B8;
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+    line-height: 1;
+}
+
+.tipnijinak-close-modal:hover {
+    color: #fff;
+}
+
+.tipnijinak-modal-content h3 {
+    margin-top: 0;
+    text-align: center;
+    margin-bottom: 25px;
+}
+
+.tipnijinak-modal-content .form-group {
+    margin-bottom: 20px;
+}
+
+.tipnijinak-modal-content .form-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 500;
+}
+
+.tipnijinak-modal-content .form-group input[type="text"],
+.tipnijinak-modal-content .form-group select {
+    width: 100%;
+    min-height: 42px;
+    border-radius: 10px;
+    border: none;
+    padding: 5px 15px;
+    background-color: #fff;
+    color: #1a1a1a;
+}
+
+/* File input */
+.tipnijinak-modal-content .file-input-wrapper {
+    position: relative;
+}
+
+.tipnijinak-modal-content .file-input {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    cursor: pointer;
+}
+
+.tipnijinak-modal-content .file-input-custom {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    background: #fff;
+    border-radius: 10px;
+    padding: 10px 15px;
+    min-height: 42px;
+}
+
+.tipnijinak-modal-content .file-input-text {
+    color: #666;
+    cursor: pointer;
+}
+
+.tipnijinak-modal-content .file-input-preview {
+    flex-shrink: 0;
+}
+
+.tipnijinak-modal-content .file-input-preview img {
+    max-width: 50px;
+    max-height: 50px;
+    border-radius: 5px;
+    object-fit: cover;
+}
+
+.tipnijinak-modal-content .form-group button {
+    width: 100%;
+}
+
+/* Admin order fields */
+.tipnijinak-order-fields {
+    margin-top: 20px;
+    padding-top: 20px;
+    border-top: 1px solid #ddd;
+}
+
+.tipnijinak-order-fields h3 {
+    margin-top: 0;
+    margin-bottom: 15px;
+    font-size: 14px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.tipnijinak-order-fields p {
+    margin: 5px 0;
+}
+
+/* Responsive styles */
+@media (max-width: 767px) {
+    .tipnijinak-checkout-fields {
+        padding: 20px 15px;
+    }
+
+    .tipnijinak-club-field .club-search-container {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .tipnijinak-club-field #tipnijinak-add-new-club {
+        text-align: center;
+    }
+
+    .tipnijinak-modal-content {
+        margin: 15% auto;
+        padding: 20px;
+    }
+
+    .tipnijinak-checkbox label {
+        font-size: 14px;
+    }
+}
