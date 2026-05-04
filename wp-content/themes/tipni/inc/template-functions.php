@@ -86,8 +86,14 @@ function tipnijinak_prepare_competition_data($competition_id = null) {
     $user_tips_count = is_user_logged_in() ? tipnijinak_get_user_tips_count($competition_id, 0, $ranking_round_id) : 0;
     $user_ranking = is_user_logged_in() ? tipnijinak_get_user_ranking($competition_id, 0, $ranking_round_id) : 0;
 
-    // Leaderboard
-    $leaderboard = tipnijinak_get_competition_leaderboard($competition_id, 10, 0, $ranking_round_id);
+    // Leaderboard se stránkováním přes ?str=N
+    $leaderboard_per_page = 10;
+    $leaderboard_page = isset($_GET['str']) ? max(1, intval($_GET['str'])) : 1;
+    $leaderboard_offset = ($leaderboard_page - 1) * $leaderboard_per_page;
+    // Načteme o jeden záznam navíc, abychom poznali, zda existuje další stránka
+    $leaderboard_raw = tipnijinak_get_competition_leaderboard($competition_id, $leaderboard_per_page + 1, $leaderboard_offset, $ranking_round_id);
+    $leaderboard_has_next = count($leaderboard_raw) > $leaderboard_per_page;
+    $leaderboard = array_slice($leaderboard_raw, 0, $leaderboard_per_page);
 
     // Active tab
     $active_tab = isset($_GET['tab']) ? $_GET['tab'] : 'competitions';
@@ -106,6 +112,10 @@ function tipnijinak_prepare_competition_data($competition_id = null) {
         'user_tips_count' => $user_tips_count,
         'user_ranking' => $user_ranking,
         'leaderboard' => $leaderboard,
+        'leaderboard_page' => $leaderboard_page,
+        'leaderboard_per_page' => $leaderboard_per_page,
+        'leaderboard_offset' => $leaderboard_offset,
+        'leaderboard_has_next' => $leaderboard_has_next,
         'active_tab' => $active_tab
     );
 }

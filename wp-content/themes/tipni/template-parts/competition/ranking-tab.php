@@ -14,6 +14,9 @@ $rounds = $args['rounds'] ?? array();
 $current_round = $args['current_round'] ?? null;
 $competition_id = $args['competition_id'] ?? get_the_ID();
 $is_main_competition = $args['is_main_competition'] ?? false;
+$leaderboard_page = $args['leaderboard_page'] ?? 1;
+$leaderboard_offset = $args['leaderboard_offset'] ?? 0;
+$leaderboard_has_next = $args['leaderboard_has_next'] ?? false;
 ?>
 
 <!-- TAB 4: Guessing-Ranking/Žebříček -->
@@ -93,12 +96,13 @@ $is_main_competition = $args['is_main_competition'] ?? false;
         }
 
         foreach ($leaderboard as $position => $user_data) :
+            $absolute_position = $leaderboard_offset + $position;
             $trophy = '';
-            if ($position === 0) {
+            if ($absolute_position === 0) {
                 $trophy = '<img src="' . esc_url(get_template_directory_uri() . '/assets/images/trophy-gold.svg') . '" alt="" width="23">';
-            } elseif ($position === 1) {
+            } elseif ($absolute_position === 1) {
                 $trophy = '<img src="' . esc_url(get_template_directory_uri() . '/assets/images/trophy-silver.svg') . '" alt="" width="23">';
-            } elseif ($position === 2) {
+            } elseif ($absolute_position === 2) {
                 $trophy = '<img src="' . esc_url(get_template_directory_uri() . '/assets/images/trophy-bronze.svg') . '" alt="" width="23">';
             }
 
@@ -114,11 +118,11 @@ $is_main_competition = $args['is_main_competition'] ?? false;
                 }
             }
 
-            // Získat cenu pro tuto pozici
-            $prize_for_position = isset($prizes[$position]) ? $prizes[$position] : null;
+            // Získat cenu pro tuto pozici (podle absolutního pořadí)
+            $prize_for_position = isset($prizes[$absolute_position]) ? $prizes[$absolute_position] : null;
         ?>
         <tr <?php echo (is_user_logged_in() && $user_data['user_id'] == get_current_user_id()) ? 'class="current-user"' : ''; ?>>
-            <td><?php echo esc_html($position + 1) . '.' . $trophy; ?></td>
+            <td><?php echo esc_html($absolute_position + 1) . '.' . $trophy; ?></td>
             <td>
                 <?php echo esc_html($user_data['name']); ?>
                 <?php if (!empty($club_logo_url)) : ?>
@@ -145,9 +149,44 @@ $is_main_competition = $args['is_main_competition'] ?? false;
     </table>
     <?php else : ?>
     <div class="no-leaderboard-data">
-        <p><?php echo $is_main_competition
-            ? esc_html__('Zatím nejsou k dispozici žádné údaje pro žebříček.', 'tipnijinak')
-            : esc_html__('Zatím nejsou k dispozici žádné údaje pro žebříček v tomto kole.', 'tipnijinak'); ?></p>
+        <p><?php
+            if ($leaderboard_page > 1) {
+                esc_html_e('Na této straně už nejsou žádné záznamy.', 'tipnijinak');
+            } elseif ($is_main_competition) {
+                esc_html_e('Zatím nejsou k dispozici žádné údaje pro žebříček.', 'tipnijinak');
+            } else {
+                esc_html_e('Zatím nejsou k dispozici žádné údaje pro žebříček v tomto kole.', 'tipnijinak');
+            }
+        ?></p>
+    </div>
+    <?php endif; ?>
+
+    <?php
+    // Stránkování — zobrazit i u prázdné stránky, aby se uživatel mohl vrátit zpět
+    $base_query = array('tab' => 'guessing-ranking');
+    if ($current_round && !$is_main_competition) {
+        $base_query['kolo'] = $current_round['id'];
+    }
+    $has_prev = $leaderboard_page > 1;
+    $has_next = !empty($leaderboard_has_next);
+    if ($has_prev || $has_next) :
+        $prev_url = $has_prev ? add_query_arg(array_merge($base_query, array('str' => $leaderboard_page - 1)), get_permalink()) : '';
+        $next_url = $has_next ? add_query_arg(array_merge($base_query, array('str' => $leaderboard_page + 1)), get_permalink()) : '';
+    ?>
+    <div class="leaderboard-pagination pagination big">
+        <?php if ($has_prev) : ?>
+            <div class="pagination-prev"><a href="<?php echo esc_url($prev_url); ?>"></a></div>
+        <?php else : ?>
+            <div class="pagination-prev disabled"></div>
+        <?php endif; ?>
+
+        <span class="pagination-info"><?php printf(esc_html__('Strana %d', 'tipnijinak'), (int) $leaderboard_page); ?></span>
+
+        <?php if ($has_next) : ?>
+            <div class="pagination-next"><a href="<?php echo esc_url($next_url); ?>"></a></div>
+        <?php else : ?>
+            <div class="pagination-next disabled"></div>
+        <?php endif; ?>
     </div>
     <?php endif; ?>
 </div>
