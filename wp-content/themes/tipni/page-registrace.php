@@ -12,7 +12,7 @@ get_header();
         <li class="active" data-step="1"><span>Osobní informace</span></li>
         <li data-step="2"><span>Přihlašovací údaje</span></li>
         <li data-step="3"><span>Dokončení registrace</span></li>
-        <li data-step="4"><span>Nákup produktu</span></li>
+        <li data-step="4"><span>Dokončení</span></li>
     </ul>
 
     <div class="form-holder ">
@@ -114,59 +114,11 @@ get_header();
             </form>
         </div>
 
-        <!-- Krok 4: Nákup produktu -->
-        <div class="registration-step  " id="step-4" style="display: none;">
-            <h3>Nákup produktu</h3>
-            <!-- <div class="subtitle">
-                Vyberte si produkt, který vám nejvíce vyhovuje. Získejte přístup k našim tipovacím soutěžím a staňte se součástí naší komunity.
-            </div> -->
-            
-            <div class="products">
-                <?php
-                // Získání produktů WooCommerce
-                $args = array(
-                    'post_type'      => 'product',
-                    'posts_per_page' => 4,
-                    'orderby'        => 'date',
-                    'order'          => 'DESC',
-                );
-                
-                $products_query = new WP_Query($args);
-                
-                if ($products_query->have_posts()) :
-                    while ($products_query->have_posts()) : $products_query->the_post();
-                        global $product;
-                        if ($product && $product->is_purchasable()) :
-                ?>
-                <div class="product" data-product-id="<?php echo esc_attr($product->get_id()); ?>" data-product-price="<?php echo esc_attr($product->get_price()); ?>">
-                    <div class="img-holder">
-                        <?php if (has_post_thumbnail()) : ?>
-                            <?php the_post_thumbnail('medium'); ?>
-                        <?php else : ?>
-                            <img src="<?php echo esc_url(get_template_directory_uri() . '/assets/images/product-photo.jpg'); ?>" alt="<?php the_title_attribute(); ?>" loading="lazy">
-                        <?php endif; ?>
-                    </div>
-                    <div class="product-text">
-                        <h3 class="product-title"><?php the_title(); ?></h3>
-                        <h4 class="product-price">cena: <?php echo $product->get_price_html(); ?></h4>
-                        <div class="product-description">
-                            <?php echo wp_trim_words(get_the_excerpt(), 15, '...'); ?>
-                        </div>
-                        <div class="btn-holder">
-                            <button type="button" class="btn btn-primary buy-product" data-product-id="<?php echo esc_attr($product->get_id()); ?>">Koupit</button>
-                        </div>
-                    </div>
-                </div>
-                <?php 
-                        endif;
-                    endwhile;
-                    wp_reset_postdata();
-                else :
-                ?>
-                <div class="no-products">
-                    <p>Momentálně nejsou k dispozici žádné produkty.</p>
-                </div>
-                <?php endif; ?>
+        <!-- Krok 4: Dokončení registrace -->
+        <div class="registration-step small-container" id="step-4" style="display: none;">
+            <div class="registration-success">
+                <h3>Registrace úspěšně dokončena!</h3>
+                <p>Tvůj účet je vytvořený a nyní se můžeš přihlásit :). K účasti v obou jedinečných soutěžích stačí nákup produktu v našem e-shopu.</p>
             </div>
         </div>
     </div>
