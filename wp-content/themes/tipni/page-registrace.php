@@ -118,7 +118,7 @@ get_header();
         <div class="registration-step small-container" id="step-4" style="display: none;">
             <div class="registration-success">
                 <h3>Registrace úspěšně dokončena!</h3>
-                <p>Tvůj účet je vytvořený a nyní se můžeš přihlásit :). K účasti v obou jedinečných soutěžích stačí nákup produktu v našem e-shopu.</p>
+                <p>Tvůj účet je vytvořený a jsi automaticky přihlášený. K účasti v obou jedinečných soutěžích stačí nákup produktu v našem e-shopu.</p>
             </div>
         </div>
     </div>
